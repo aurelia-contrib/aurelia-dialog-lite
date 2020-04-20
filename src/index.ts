@@ -21,7 +21,7 @@ export function configure(
   settings?: Omit<DialogSettings, 'viewModel' | 'view' | 'model'>
 ): void | Promise<void> {
   // Put css on top of head, in order to allow easier user override
-  DOM.injectStyles(css, DOM.querySelector('head'), true);
+  DOM.injectStyles(css, DOM.querySelector('head'), true, 'dialog-lite-css');
 
   if (settings) {
     const defaultSettings = config.container.get(DefaultDialogSettings);
