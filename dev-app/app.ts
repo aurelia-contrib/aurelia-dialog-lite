@@ -4,10 +4,10 @@ import {TestDialog} from './test-dialog';
 
 @autoinject
 export class App {
-  constructor(private dialog: DialogService) {}
+  constructor(private dialogService: DialogService) {}
 
   openDialog() {
-    this.dialog.open({
+    this.dialogService.open({
       viewModel: TestDialog,
       model: {
         name: 'Test'

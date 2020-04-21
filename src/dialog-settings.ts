@@ -55,14 +55,6 @@ export interface DialogSettings {
    * When set to true conveys a cancellation as a rejection.
    */
   rejectOnCancel?: boolean;
-
-  /**
-   * This function is called when a dialog closes to restore focus to the last
-   * element that was focused when the dialog opened. It can be overridden in
-   * general settings, or on a case by case basis by providing an override when
-   * a particular dialog is opened.
-   */
-  restoreFocus?: (lastActiveElement: HTMLElement) => void;
 }
 
 /**

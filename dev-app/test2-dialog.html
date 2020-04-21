@@ -1,0 +1,7 @@
+<template>
+  <div style="background-color: lightgreen; border: 1px solid lightgray; padding: 1rem;">
+    <h4>Dialog: ${model.name}</h4>
+    <button click.trigger="controller.cancel()">Cancel</button>
+    <button click.trigger="controller.ok('payload2')">OK</button>
+  </div>
+</template>

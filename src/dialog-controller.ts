@@ -7,6 +7,21 @@ import { invokeLifecycle } from './lifecycle';
 import { createDialogCloseError, DialogCloseError } from './dialog-close-error';
 import { createDialogCancelError } from './dialog-cancel-error';
 
+// https://github.com/ghosh/Micromodal
+const FOCUSABLE_ELEMENTS = [
+  'a[href]',
+  'area[href]',
+  'input:not([disabled]):not([type="hidden"]):not([aria-hidden])',
+  'select:not([disabled]):not([aria-hidden])',
+  'textarea:not([disabled]):not([aria-hidden])',
+  'button:not([disabled]):not([aria-hidden])',
+  'iframe',
+  'object',
+  'embed',
+  '[contenteditable]',
+  '[tabindex]:not([tabindex^="-"])'
+].join(', ');
+
 /**
  * A controller object for a Dialog instance.
  */
@@ -45,6 +60,7 @@ export class DialogController {
     this.resolve = resolve;
     this.reject = reject;
     this.cancelOnOverlay = this.cancelOnOverlay.bind(this);
+    this.retainFocus = this.retainFocus.bind(this);
 
     this.dialogOverlay = DOM.createElement('div') as HTMLElement;
     this.dialogOverlay.classList.add('dialog-lite-overlay');
@@ -93,6 +109,36 @@ export class DialogController {
   public cancelOnOverlay(event: Event): Promise<DialogCancelableOperationResult> {
     if (this.settings.overlayDismiss && event.target === this.dialogOverlay) {
       return this.close(false);
+    }
+  }
+
+  private getFocusableNodes(): HTMLElement[] {
+    const nodes = this.dialogOverlay.querySelectorAll(FOCUSABLE_ELEMENTS)
+    return Array.from(nodes) as HTMLElement[];
+  }
+
+  public retainFocus(event: KeyboardEvent) {
+    if (event.key !== 'Tab') return;
+    event.stopPropagation(); // Stop others listening on Tab.
+    event.preventDefault();
+
+    let focusableNodes = this.getFocusableNodes();
+
+    // no focusable nodes
+    if (focusableNodes.length === 0) return;
+
+    // Filters nodes which are hidden to prevent focus leak outside modal.
+    focusableNodes = focusableNodes.filter(node => node.offsetParent);
+
+    const active = DOM.activeElement as HTMLElement;
+    if (!this.dialogOverlay.contains(active)) {
+      focusableNodes[0].focus();
+    } else {
+      const index = focusableNodes.indexOf(active);
+      let nextIndex = index + (event.shiftKey ? -1 : 1);
+      if (nextIndex >= focusableNodes.length) nextIndex = 0;
+      else if (nextIndex < 0) nextIndex = focusableNodes.length - 1;
+      focusableNodes[nextIndex].focus();
     }
   }
 
