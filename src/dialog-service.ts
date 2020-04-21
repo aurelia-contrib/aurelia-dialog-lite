@@ -165,9 +165,9 @@ export class DialogService {
       dialogController.dialogOverlay,
       dialogController.settings
     );
-    const openResult = this.ensureViewModel(compositionContext).then<boolean>(compositionContext => {
-      if (!compositionContext.viewModel) { return true; }
-      return invokeLifecycle(compositionContext.viewModel, 'canActivate', dialogController.settings.model);
+    const openResult = this.ensureViewModel(compositionContext).then<boolean>(context => {
+      if (!context.viewModel) { return true; }
+      return invokeLifecycle(context.viewModel, 'canActivate', dialogController.settings.model);
     }).then<DialogCancellableOpenResult>(canActivate => {
       if (!canActivate) {
         return this._cancelOperation(dialogController.settings.rejectOnCancel as boolean);
