@@ -3,7 +3,6 @@ import { DialogSettings, DefaultDialogSettings } from './dialog-settings';
 import { DOM } from 'aurelia-pal';
 
 const css = `.dialog-lite-overlay {
-  display: block;
   position: fixed;
   top: 0;
   left: 0;
