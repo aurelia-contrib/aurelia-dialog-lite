@@ -10,7 +10,7 @@ export class TestDialog {
     this.dialogService = dialogService;
     this.controller = controller;
     this.controller.settings.lock = false;
-    this.controller.settings.keyboard = true;
+    this.controller.settings.keyboard = ['Escape', 'Enter'];
     this.controller.settings.overlayDismiss = true;
   }
 

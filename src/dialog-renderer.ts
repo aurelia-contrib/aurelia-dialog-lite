@@ -3,30 +3,14 @@ import { transient } from 'aurelia-dependency-injection';
 import type { DialogController } from './dialog-controller';
 import type { ActionKey } from './dialog-settings';
 
-function getActionKey(e: KeyboardEvent): ActionKey | 'Tab' | undefined {
-  if ((e.code || e.key) === 'Escape' || e.keyCode === 27) {
-    return 'Escape';
-  }
-  if ((e.code || e.key) === 'Enter' || e.keyCode === 13) {
-    return 'Enter';
-  }
-  if ((e.code || e.key) === 'Tab' || e.keyCode === 9) {
-    return 'Tab';
-  }
-  return undefined;
-}
-
 class DialogRenderer {
   public static dialogControllers: DialogController[] = [];
 
   public static keyboardEventHandler(e: KeyboardEvent) {
-    const key = getActionKey(e);
+    const { key } = e;
     if (!key) return;
     const top = DialogRenderer.dialogControllers[DialogRenderer.dialogControllers.length - 1];
     if (!top) return;
-    if (key === 'Tab') {
-      top.retainFocus(e);
-    }
     if (!top.settings.keyboard) return;
     const keyboard = top.settings.keyboard;
     if (key === 'Escape'
@@ -37,10 +21,19 @@ class DialogRenderer {
     }
   }
 
+  public static tabDownHandler(e: KeyboardEvent) {
+    const { key } = e;
+    if (!key || key !== 'Tab') return;
+    const top = DialogRenderer.dialogControllers[DialogRenderer.dialogControllers.length - 1];
+    if (!top) return;
+    top.retainFocus(e);
+  }
+
   public static trackController(dialogController: DialogController): void {
     const trackedDialogControllers = DialogRenderer.dialogControllers;
     if (!trackedDialogControllers.length) {
-      DOM.addEventListener('keydown', DialogRenderer.keyboardEventHandler, false);
+      DOM.addEventListener('keyup', DialogRenderer.keyboardEventHandler, false);
+      DOM.addEventListener('keydown', DialogRenderer.tabDownHandler, false);
     }
     trackedDialogControllers.push(dialogController);
   }
@@ -52,11 +45,8 @@ class DialogRenderer {
       trackedDialogControllers.splice(i, 1);
     }
     if (!trackedDialogControllers.length) {
-      DOM.removeEventListener(
-        'keydown',
-        DialogRenderer.keyboardEventHandler,
-        false
-      );
+      DOM.removeEventListener('keyup', DialogRenderer.keyboardEventHandler, false);
+      DOM.removeEventListener('keydown', DialogRenderer.tabDownHandler, false);
     }
   }
 
