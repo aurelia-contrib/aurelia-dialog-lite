@@ -1,3 +1,12 @@
+## [0.1.2](https://github.com/3cp/aurelia-dialog-lite/compare/v0.1.1...v0.1.2) (2020-04-22)
+
+
+### Bug Fixes
+
+* separate Enter/Escape and Tab handler ([a16db12](https://github.com/3cp/aurelia-dialog-lite/commit/a16db12af0cc4a68a75d65285c68d781ebac1e8d))
+
+
+
 ## [0.1.1](https://github.com/3cp/aurelia-dialog-lite/compare/v0.1.0...v0.1.1) (2020-04-21)
 
 
