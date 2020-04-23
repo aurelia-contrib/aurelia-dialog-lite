@@ -12,9 +12,8 @@ export class App {
       model: {
         name: 'Test'
       }
-    }).whenClosed(response => {
-      if (response.wasCancelled) return;
-      console.log(response.output);
-    })
+    }).then(result => {
+      console.log(result);
+    });
   }
 }

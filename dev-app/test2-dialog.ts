@@ -6,10 +6,8 @@ export class Test2Dialog {
   model: any;
 
   constructor(private controller: DialogController) {
-    this.controller = controller;
-    this.controller.settings.lock = false;
-    this.controller.settings.keyboard = true;
-    this.controller.settings.overlayDismiss = true;
+    this.controller.settings.escDismiss = false;
+    this.controller.settings.overlayDismiss = false;
   }
 
   activate(model: any) {

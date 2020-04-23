@@ -1,14 +1,10 @@
 import type { ViewStrategy } from 'aurelia-templating';
 import { DOM } from 'aurelia-pal';
 
-export type ActionKey = 'Escape' | 'Enter';
-
 /**
  * All available dialog settings.
  */
 export interface DialogSettings {
-  [setting: string]: any;
-
   /**
    * The view model url, constructor or instance for the dialog.
    */
@@ -26,43 +22,36 @@ export interface DialogSettings {
 
   /**
    * The element that will parent the dialog.
+   * Default to document.body.
    */
   host?: Element;
 
   /**
-   * When set to "false" allows the dialog to be closed with ESC key or clicking outside the dialog.
-   * When set to "true" the dialog does not close on ESC key or clicking outside of it.
+   * The CSS class name for the overlay element.
+   * An overlay element is created for every dialog, it hosts dialog view.
+   * When showing the dialog its overlay element is inserted to host element.
    */
-  lock?: boolean;
+  overlayClassName?: string;
 
   /**
    * Allows for closing the top most dialog via the keyboard.
    * When set to "false" no action will be taken.
-   * If set to "true", "Escape" or an array containing "Escape"
-   * the dialog will be "cancel" closed when the ESC key is pressed.
-   * If set to "Enter" or and array containing "Enter"
-   * the dialog will be "ok" closed  when the ENTER key is pressed.
-   * Using the array format allows combining the ESC and ENTER keys.
+   * When set to "true" the dialog will be "cancel" closed when the ESC key is pressed.
    */
-  keyboard?: boolean | ActionKey | ActionKey[];
+  escDismiss?: boolean;
 
   /**
    * When set to "true" allows for the dismissal of the dialog by clicking outside of it.
    */
   overlayDismiss?: boolean;
-
-  /**
-   * When set to true conveys a cancellation as a rejection.
-   */
-  rejectOnCancel?: boolean;
 }
 
 /**
  * @internal
  */
 export class DefaultDialogSettings implements DialogSettings {
-  [setting: string]: any;
   public host = DOM.querySelector('body') as HTMLBodyElement;
-  public lock = true;
-  public rejectOnCancel = false;
+  public overlayClassName = 'dialog-lite-overlay';
+  public escDismiss = false;
+  public overlayDismiss = false;
 }

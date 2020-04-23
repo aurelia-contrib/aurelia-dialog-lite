@@ -1,38 +1,13 @@
+import { DOM } from 'aurelia-pal';
 import { Container } from 'aurelia-dependency-injection';
 import { CompositionEngine, Controller, ViewSlot, CompositionContext } from 'aurelia-templating';
-import { DialogOpenResult, DialogCloseResult, DialogCancelResult } from './dialog-result';
 import { DialogSettings, DefaultDialogSettings } from './dialog-settings';
-import { createDialogCancelError } from './dialog-cancel-error';
-import { invokeLifecycle } from './lifecycle';
 import { DialogController } from './dialog-controller';
-
-export type DialogCancellableOpenResult = DialogOpenResult | DialogCancelResult;
-
-/* tslint:disable:max-line-length */
-export interface DialogOpenPromise<T extends DialogCancellableOpenResult> extends Promise<T> {
-  whenClosed(onfulfilled?: ((value: DialogCloseResult) => DialogCloseResult | PromiseLike<DialogCloseResult>) | undefined | null, onrejected?: ((reason: any) => DialogCloseResult | PromiseLike<DialogCloseResult>) | undefined | null): Promise<DialogCloseResult>;
-  whenClosed<TResult>(onfulfilled: ((value: DialogCloseResult) => DialogCloseResult | PromiseLike<DialogCloseResult>) | undefined | null, onrejected: (reason: any) => TResult | PromiseLike<TResult>): Promise<DialogCloseResult | TResult>;
-  whenClosed<TResult>(onfulfilled: (value: DialogCloseResult) => TResult | PromiseLike<TResult>, onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<TResult>;
-  whenClosed<TResult1, TResult2>(onfulfilled: (value: DialogCloseResult) => TResult1 | PromiseLike<TResult1>, onrejected: (reason: any) => TResult2 | PromiseLike<TResult2>): Promise<TResult1 | TResult2>;
-}
-/* tslint:enable:max-line-length */
-
-function whenClosed(this: Promise<DialogCancellableOpenResult>, onfulfilled?: any, onrejected?: any) {
-  return this.then<DialogCloseResult>(r => r.wasCancelled ? r : (r as DialogOpenResult).closeResult).then(onfulfilled, onrejected);
-}
-function asDialogOpenPromise<T extends DialogCancellableOpenResult>(promise: Promise<T>): DialogOpenPromise<T> {
-  (promise as DialogOpenPromise<T>).whenClosed = whenClosed;
-  return promise as DialogOpenPromise<T>;
-}
 
 /**
  * A service allowing for the creation of dialogs.
  */
 export class DialogService {
-  private container: Container;
-  private compositionEngine: CompositionEngine;
-  private defaultSettings: DialogSettings;
-
   /**
    * The current dialog controllers
    */
@@ -41,173 +16,117 @@ export class DialogService {
   /**
    * Is there an open dialog
    */
-  public hasOpenDialog: boolean = false;
   public hasActiveDialog: boolean = false;
 
   /**
    * @internal
    */
-  // tslint:disable-next-line:member-ordering
   public static inject = [Container, CompositionEngine, DefaultDialogSettings];
-  constructor(container: Container, compositionEngine: CompositionEngine, defaultSettings: DialogSettings) {
-    this.container = container;
-    this.compositionEngine = compositionEngine;
-    this.defaultSettings = defaultSettings;
+  constructor(
+    private container: Container,
+    private compositionEngine: CompositionEngine,
+    private defaultSettings: DialogSettings) {
+    this.escAndTab = this.escAndTab.bind(this);
   }
 
-  private validateSettings(settings: DialogSettings): void {
-    if (!settings.viewModel && !settings.view) {
-      throw new Error('Invalid Dialog Settings. You must provide "viewModel", "view" or both.');
-    }
-  }
-
-  private createCompositionContext(childContainer: Container, host: Element, settings: DialogSettings): CompositionContext {
-    return {
-      container: childContainer.parent,
-      childContainer,
-      bindingContext: null,
-      viewResources: null as any,
-      model: settings.model,
-      view: settings.view,
-      viewModel: settings.viewModel,
-      viewSlot: new ViewSlot(host, true),
-      host
-    };
-  }
-
-  private ensureViewModel(compositionContext: CompositionContext): Promise<CompositionContext> {
-    if (typeof compositionContext.viewModel === 'object') {
-      return Promise.resolve(compositionContext);
-    }
-    return this.compositionEngine.ensureViewModel(compositionContext);
-  }
-
-  private _cancelOperation(rejectOnCancel: boolean): DialogCancelResult {
-    if (!rejectOnCancel) {
-      return { wasCancelled: true };
-    }
-    throw createDialogCancelError();
-  }
-
-  // tslint:disable-next-line:max-line-length
-  private composeAndShowDialog(compositionContext: CompositionContext, dialogController: DialogController): Promise<void> {
+  private composeAndShowDialog(compositionContext: CompositionContext, dialogController: DialogController): Promise<DialogController> {
     if (!compositionContext.viewModel) {
       // provide access to the dialog controller for view only dialogs
       compositionContext.bindingContext = { controller: dialogController };
     }
     return this.compositionEngine
       .compose(compositionContext)
-      .then<void>((controller: Controller) => {
+      .then((controller: Controller) => {
         dialogController.controller = controller;
-        dialogController.renderer.showDialog(dialogController);
-          // .then(
-          //   () => {
-        this.controllers.push(dialogController);
-        this.hasActiveDialog = this.hasOpenDialog = !!this.controllers.length;
-            // },
-            // reason => {
-            //   if (controller.viewModel) {
-            //     invokeLifecycle(controller.viewModel, 'deactivate');
-            //   }
-            //   return Promise.reject(reason);
-            // });
-    });
+        dialogController.show();
+        this.addController(dialogController);
+        return dialogController;
+      });
+  }
+
+  /**
+   * Opens a new dialog, same as
+   *   dialogService.create(settings).then(controller => controller.closePromise).
+   * @param settings Dialog settings for this dialog instance.
+   * @return Promise A promise that settles when the dialog is closed.
+   */
+  public open(settings: DialogSettings = {}): Promise<any> {
+    return this.create(settings).then(
+      dialogController => dialogController.closePromise
+    );
+  }
+
+  /**
+   * Opens a new dialog and resolves to the dialog controller
+   * @param settings Dialog settings for this dialog instance.
+   * @return Promise A promise that resolves to dialog controller.
+   */
+  public create(settings: DialogSettings = {}): Promise<DialogController> {
+    settings = Object.assign({}, this.defaultSettings, settings);
+    if (!settings.viewModel && !settings.view) {
+      return Promise.reject(
+        new Error('Invalid Dialog Settings. You must provide "viewModel", "view" or both.')
+      );
+    }
+
+    const childContainer = this.container.createChild();
+    const dialogController = childContainer.invoke(DialogController, [settings]);
+    childContainer.registerInstance(DialogController, dialogController);
+    dialogController.closePromise.catch(() => null).then(
+      () => this.removeController(dialogController)
+    );
+
+    const compositionContext = {
+      container: this.container,
+      childContainer,
+      bindingContext: null,
+      viewResources: null as any,
+      model: settings.model,
+      view: settings.view,
+      viewModel: settings.viewModel,
+      viewSlot: new ViewSlot(dialogController.dialogOverlay, true),
+      host: dialogController.dialogOverlay
+    };
+
+    return this.composeAndShowDialog(compositionContext, dialogController);
   }
 
   /**
    * @internal
    */
-  public createSettings(settings: DialogSettings): DialogSettings {
-    settings = Object.assign({}, this.defaultSettings, settings);
-    if (typeof settings.keyboard !== 'boolean' && !settings.keyboard) {
-      settings.keyboard = !settings.lock;
+  private addController(dialogController: DialogController): void {
+    this.controllers.push(dialogController);
+    if (!this.hasActiveDialog) {
+      this.hasActiveDialog = true;
+      DOM.addEventListener('keydown', this.escAndTab, false);
     }
-    if (typeof settings.overlayDismiss !== 'boolean') {
-      settings.overlayDismiss = !settings.lock;
-    }
-    Object.defineProperty(settings, 'rejectOnCancel', {
-      writable: false,
-      configurable: true,
-      enumerable: true
-    });
-    this.validateSettings(settings);
-    return settings;
   }
 
   /**
-   * Opens a new dialog.
-   * @param settings Dialog settings for this dialog instance.
-   * @return Promise A promise that settles when the dialog is closed.
+   * @internal
    */
-  // tslint:disable:max-line-length
-  public open(settings: DialogSettings & { rejectOnCancel: true }): DialogOpenPromise<DialogOpenResult>;
-  public open(settings?: DialogSettings & { rejectOnCancel?: false | boolean }): DialogOpenPromise<DialogCancellableOpenResult>;
-  public open(settings: DialogSettings = {}): DialogOpenPromise<DialogCancellableOpenResult> {
-    // tslint:enable:max-line-length
-    settings = this.createSettings(settings);
-    const childContainer = this.container.createChild();
-    let resolveCloseResult: any;
-    let rejectCloseResult: any;
-    const closeResult: Promise<DialogCloseResult> = new Promise((resolve, reject) => {
-      resolveCloseResult = resolve;
-      rejectCloseResult = reject;
-    });
-    const dialogController =
-      childContainer.invoke(DialogController, [settings, resolveCloseResult, rejectCloseResult]);
-    childContainer.registerInstance(DialogController, dialogController);
-    closeResult.then(() => {
-      removeController(this, dialogController);
-    }, () => {
-      removeController(this, dialogController);
-    });
-    const compositionContext = this.createCompositionContext(
-      childContainer,
-      dialogController.dialogOverlay,
-      dialogController.settings
-    );
-    const openResult = this.ensureViewModel(compositionContext).then<boolean>(context => {
-      if (!context.viewModel) { return true; }
-      return invokeLifecycle(context.viewModel, 'canActivate', dialogController.settings.model);
-    }).then<DialogCancellableOpenResult>(canActivate => {
-      if (!canActivate) {
-        return this._cancelOperation(dialogController.settings.rejectOnCancel as boolean);
+  private removeController(dialogController: DialogController): void {
+    const i = this.controllers.indexOf(dialogController);
+    if (i !== -1) {
+      this.controllers.splice(i, 1);
+      if (this.controllers.length === 0 && this.hasActiveDialog) {
+        this.hasActiveDialog = false;
+        DOM.removeEventListener('keydown', this.escAndTab, false);
       }
-      // if activation granted, compose and show
-      return this.composeAndShowDialog(compositionContext, dialogController)
-        .then(() => ({ controller: dialogController, closeResult, wasCancelled: false } as DialogOpenResult));
-    });
-
-    return asDialogOpenPromise(openResult);
+    }
   }
 
   /**
-   * Closes all open dialogs at the time of invocation.
-   * @return Promise<DialogController[]> All controllers whose close operation was cancelled.
+   * @internal
    */
-  public closeAll(): Promise<DialogController[]> {
-    return Promise.all(this.controllers.slice(0).map(controller => {
-      if (!controller.settings.rejectOnCancel) {
-        return controller.cancel().then(result => {
-          if (result.wasCancelled) {
-            return controller;
-          }
-          return null;
-        });
-      }
-      return controller.cancel().then(() => null).catch<DialogController>(reason => {
-        if (reason.wasCancelled) {
-          return controller;
-        }
-        throw reason;
-      });
-    })).then(unclosedControllers => unclosedControllers.filter(unclosed => !!unclosed) as DialogController[]);
-  }
-}
-
-function removeController(service: DialogService, dialogController: DialogController): void {
-  const i = service.controllers.indexOf(dialogController);
-  if (i !== -1) {
-    service.controllers.splice(i, 1);
-    service.hasActiveDialog = service.hasOpenDialog = !!service.controllers.length;
+  private escAndTab(e: KeyboardEvent) {
+    const { key } = e;
+    const top = this.controllers[this.controllers.length - 1];
+    if (!top) return;
+    if (key === 'Tab') {
+      top.retainFocus(e);
+    } else if (key === 'Escape' && top.settings.escDismiss) {
+      top.cancel();
+    }
   }
 }

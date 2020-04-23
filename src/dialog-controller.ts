@@ -1,11 +1,6 @@
 import { DOM } from 'aurelia-pal';
-import { Controller } from 'aurelia-templating';
-import type { DialogCancelableOperationResult, DialogCloseResult, DialogCancelResult } from './dialog-result';
-import { DialogRenderer } from './dialog-renderer';
+import type { Controller } from 'aurelia-templating';
 import type { DialogSettings } from './dialog-settings';
-import { invokeLifecycle } from './lifecycle';
-import { createDialogCloseError, DialogCloseError } from './dialog-close-error';
-import { createDialogCancelError } from './dialog-cancel-error';
 
 // https://github.com/ghosh/Micromodal
 const FOCUSABLE_ELEMENTS = [
@@ -26,97 +21,88 @@ const FOCUSABLE_ELEMENTS = [
  * A controller object for a Dialog instance.
  */
 export class DialogController {
-  private resolve: (data?: any) => void;
-  private reject: (reason: any) => void;
-
-  /**
-   * @internal
-   */
-  public closePromise: Promise<any> | undefined;
-
   /**
    * The settings used by this controller.
    */
-  public renderer: DialogRenderer;
-  public settings: DialogSettings;
   public controller: Controller;
   public dialogOverlay: HTMLElement;
+  public closePromise: Promise<any>;
 
   /**
    * @internal
    */
-  // tslint:disable-next-line:member-ordering
-  public static inject = [DialogRenderer];
+  private _resolve: (output?: any) => void;
+  private _reject: (reason: Error) => void;
+  private lastActiveElement: HTMLElement;
+
   /**
    * Creates an instance of DialogController.
    */
-  constructor(
-    renderer: DialogRenderer,
-    settings: DialogSettings,
-    resolve: (data?: any) => void,
-    reject: (reason: any) => void) {
-    this.renderer = renderer;
-    this.settings = settings;
-    this.resolve = resolve;
-    this.reject = reject;
-    this.cancelOnOverlay = this.cancelOnOverlay.bind(this);
-    this.retainFocus = this.retainFocus.bind(this);
-
+  constructor(public settings: DialogSettings) {
     this.dialogOverlay = DOM.createElement('div') as HTMLElement;
-    this.dialogOverlay.classList.add('dialog-lite-overlay');
-  }
+    this.dialogOverlay.classList.add(settings.overlayClassName);
 
-  /**
-   * @internal
-   */
-  public releaseResources(result: DialogCloseResult | DialogCloseError): Promise<void> {
-    return invokeLifecycle(this.controller.viewModel || {}, 'deactivate', result)
-      .then(() => this.renderer.hideDialog(this))
-      .then(() => {
-        this.controller.unbind();
-      });
-  }
+    this.closePromise = new Promise<any>((resolve, reject) => {
+      this._resolve = resolve;
+      this._reject = reject;
+    });
 
-  /**
-   * @internal
-   */
-  public cancelOperation(): DialogCancelResult {
-    if (!this.settings.rejectOnCancel) {
-      return { wasCancelled: true };
-    }
-    throw createDialogCancelError();
+    this.cancelOnOverlay = this.cancelOnOverlay.bind(this);
+    this.ok = this.ok.bind(this);
+    this.cancel = this.cancel.bind(this);
   }
 
   /**
    * Closes the dialog with a successful output.
    * @param output The returned success output.
    */
-  public ok(output?: any): Promise<DialogCancelableOperationResult> {
-    return this.close(true, output);
+  public ok(output?: any): void {
+    this.close(true, output);
   }
 
   /**
    * Closes the dialog with a cancel output.
    * @param output The returned cancel output.
    */
-  public cancel(output?: any): Promise<DialogCancelableOperationResult> {
-    return this.close(false, output);
+  public cancel(reason: string = 'cancelled'): void {
+    this.close(false, new Error(reason));
   }
 
   /**
    * @internal
    */
-  public cancelOnOverlay(event: Event): Promise<DialogCancelableOperationResult> {
+  public cancelOnOverlay(event: Event): void {
     if (this.settings.overlayDismiss && event.target === this.dialogOverlay) {
-      return this.close(false);
+      this.cancel();
     }
   }
 
+  /**
+   * @internal
+   */
+  private close(ok: boolean, output?: any): void {
+    // tslint:disable-next-line:no-string-literal
+    if (this.controller['isAttached']) {
+      this.hide();
+      if (ok) {
+        this._resolve(output);
+      } else {
+        this._reject(output as Error);
+      }
+    }
+  }
+
+  /**
+   * @internal
+   */
   private getFocusableNodes(): HTMLElement[] {
     const nodes = this.dialogOverlay.querySelectorAll(FOCUSABLE_ELEMENTS)
     return Array.from(nodes) as HTMLElement[];
   }
 
+  /**
+   * @internal
+   */
   public retainFocus(event: KeyboardEvent) {
     if (event.key !== 'Tab') return;
     event.stopPropagation(); // Stop others listening on Tab.
@@ -143,48 +129,51 @@ export class DialogController {
   }
 
   /**
-   * Closes the dialog with an error output.
-   * @param output A reason for closing with an error.
-   * @returns Promise An empty promise object.
+   * @internal
    */
-  public error(output: any): Promise<void> {
-    const closeError = createDialogCloseError(output);
-    return this.releaseResources(closeError).then(() => { this.reject(closeError); });
+  public show(): void {
+    if (!this.controller) {
+      throw new Error('Cannot show dialog before composing');
+    }
+
+    this.lastActiveElement = DOM.activeElement as HTMLElement;
+    if (this.lastActiveElement) this.lastActiveElement.blur();
+
+    this.settings.host.appendChild(this.dialogOverlay);
+    this.controller.attached();
+    this.setupOverlayDismiss();
+    // trackController(this);
   }
 
   /**
-   * Closes the dialog.
-   * @param ok Whether or not the user input signified success.
-   * @param output The specified output.
-   * @returns Promise An empty promise object.
+   * @internal
    */
-  public close(ok: boolean, output?: any): Promise<DialogCancelableOperationResult> {
-    if (this.closePromise) {
-      return this.closePromise;
+  public hide(): void {
+    // untrackController(this);
+    this.clearOverlayDismiss();
+
+    this.settings.host.removeChild(this.dialogOverlay);
+    this.controller.detached();
+    this.controller.unbind();
+    if (this.lastActiveElement) {
+      this.lastActiveElement.focus();
     }
-
-    const dialogResult: DialogCloseResult = { wasCancelled: !ok, output };
-
-    return this.closePromise = invokeLifecycle(this.controller.viewModel || {}, 'canDeactivate', dialogResult)
-      .catch(reason => {
-        this.closePromise = undefined;
-        return Promise.reject(reason);
-      }).then(canDeactivate => {
-        if (!canDeactivate) {
-          this.closePromise = undefined; // we are done, do not block consecutive calls
-          return this.cancelOperation();
-        }
-        return this.releaseResources(dialogResult).then(() => {
-          if (!this.settings.rejectOnCancel || ok) {
-            this.resolve(dialogResult);
-          } else {
-            this.reject(createDialogCancelError(output));
-          }
-          return { wasCancelled: false };
-        }).catch(reason => {
-          this.closePromise = undefined;
-          return Promise.reject(reason);
-        });
-      });
   }
+
+  /**
+   * @internal
+   */
+  private setupOverlayDismiss(): void {
+    this.dialogOverlay.addEventListener('click', this.cancelOnOverlay);
+    this.dialogOverlay.addEventListener('touchstart', this.cancelOnOverlay);
+  }
+
+  /**
+   * @internal
+   */
+  private clearOverlayDismiss(): void {
+    this.dialogOverlay.removeEventListener('click', this.cancelOnOverlay);
+    this.dialogOverlay.removeEventListener('touchstart', this.cancelOnOverlay);
+  }
+
 }

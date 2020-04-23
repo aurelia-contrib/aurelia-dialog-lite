@@ -7,10 +7,7 @@ export class TestDialog {
   model: any;
 
   constructor(private dialogService: DialogService, private controller: DialogController) {
-    this.dialogService = dialogService;
-    this.controller = controller;
-    this.controller.settings.lock = false;
-    this.controller.settings.keyboard = ['Escape', 'Enter'];
+    this.controller.settings.escDismiss = true;
     this.controller.settings.overlayDismiss = true;
   }
 
@@ -19,14 +16,19 @@ export class TestDialog {
   }
 
   openDialog() {
-    this.dialogService.open({
+    this.dialogService.create({
       viewModel: Test2Dialog,
       model: {
         name: 'Test2'
       }
-    }).whenClosed(response => {
-      if (response.wasCancelled) return;
-      console.log(response.output);
-    })
+    }).then(controller => {
+
+      controller.closePromise.then(
+        r => console.log('test2 result', r),
+        e => console.error('test2 error', e),
+      );
+
+      setTimeout(() => controller.cancel('special'), 5000);
+    });
   }
 }

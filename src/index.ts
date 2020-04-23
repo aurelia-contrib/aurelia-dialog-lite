@@ -28,11 +28,6 @@ export function configure(
   }
 }
 
-export * from './interfaces';
 export * from './dialog-settings';
-export * from './dialog-renderer';
-export * from './dialog-cancel-error';
-export * from './dialog-close-error';
-export * from './dialog-result';
 export * from './dialog-service';
 export * from './dialog-controller';
