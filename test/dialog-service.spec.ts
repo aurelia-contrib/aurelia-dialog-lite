@@ -29,10 +29,18 @@ export class TestDialog {
   }
 }
 
-async function delay(ms: number = 50) {
+async function delay(ms: number = 20) {
   return new Promise(resolve => {
     setTimeout(resolve, ms);
   });
+}
+
+async function hit(options) {
+  options.bubbles = true;
+  document.activeElement.dispatchEvent(new KeyboardEvent('keydown', options));
+  await delay();
+  document.activeElement.dispatchEvent(new KeyboardEvent('keyup', options));
+  await delay();
 }
 
 describe('DialogService', () => {
@@ -389,5 +397,63 @@ describe('DialogService', () => {
       }
     });
   });
+
+  describe('focus trap', () => {
+    let btn;
+    beforeAll(() => {
+      btn = document.createElement('button');
+      btn.id = 'btn';
+      btn.textContent = 'in body';
+      document.body.appendChild(btn);
+      btn.focus();
+    });
+
+    afterAll(() => {
+      document.querySelector('#btn').remove();
+    });
+
+    it('traps focus', async () => {
+      expect(document.activeElement).toBe(btn);
+
+      const closePromise = dialogService.open({viewModel: TestDialog, model: { title: 'Test title'}});
+      await delay();
+
+      // dialogService resets focus.
+      expect(document.activeElement).toBe(document.body);
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('cancelBtn');
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('cancelBtn2');
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('okBtn');
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('okBtn2');
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('cancelBtn');
+      await hit({key: 'Tab', shiftKey: true});
+      expect(document.activeElement.id).toBe('okBtn2');
+      await hit({key: 'Tab', shiftKey: true});
+      expect(document.activeElement.id).toBe('okBtn');
+      await hit({key: 'Tab', shiftKey: true});
+      expect(document.activeElement.id).toBe('cancelBtn2');
+      await hit({key: 'Tab', shiftKey: true});
+      expect(document.activeElement.id).toBe('cancelBtn');
+      await hit({key: 'Tab'});
+      await hit({key: 'Tab'});
+      // focus on #okBtn
+      // Don't know what to simulate Enter or Space to let
+      // browser fire click event (default behavior).
+      // Just fire a click event here.
+      document.activeElement.dispatchEvent(new Event('click'));
+
+      const result = await closePromise;
+      // dialogService restores focus.
+      expect(document.activeElement).toBe(btn);
+
+      expect(result).toBeUndefined();
+      expect(dialogService.controllers.length).toBe(0);
+      expect(dialogService.hasActiveDialog).toBe(false);
+    });
+  })
 });
 
