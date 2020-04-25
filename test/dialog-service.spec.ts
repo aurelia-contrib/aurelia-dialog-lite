@@ -8,6 +8,17 @@ import { DefaultDialogSettings, DialogSettings } from '../src/dialog-settings';
 import { DialogController } from '../src/dialog-controller';
 import { DialogService } from '../src/dialog-service';
 
+const css = `.dialog-lite-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: block;
+}
+`;
+DOM.injectStyles(css, DOM.querySelector('head'), true, 'dialog-lite-css');
+
 @inlineView(`<template>
   <div class="dialog">
     <h2>\${title}</h2>
@@ -422,7 +433,7 @@ describe('DialogService', () => {
 
   describe('focus trap', () => {
     let btn;
-    beforeAll(() => {
+    beforeEach(() => {
       btn = document.createElement('button');
       btn.id = 'btn';
       btn.textContent = 'in body';
@@ -430,7 +441,7 @@ describe('DialogService', () => {
       btn.focus();
     });
 
-    afterAll(() => {
+    afterEach(() => {
       document.querySelector('#btn').remove();
     });
 
@@ -564,7 +575,6 @@ describe('DialogService', () => {
       expect(dialogService.hasActiveDialog).toBe(false);
     });
 
-
     it('traps focus in stacks of dialogs, but does not restore focus to detached dom', async () => {
       expect(document.activeElement).toBe(btn);
 
@@ -608,5 +618,54 @@ describe('DialogService', () => {
       expect(overlays.length).toBe(0);
     });
   });
-});
 
+  describe('ESC dismiss', () => {
+    it('by default does not dismiss dialog on ESC key', async () => {
+      const closePromise = dialogService.open({viewModel: TestDialog, model: { title: 'Test title'}});
+      await delay();
+
+      await hit({key: 'Escape'});
+      expect(dialogService.controllers.length).toBe(1);
+      expect(dialogService.hasActiveDialog).toBe(true);
+
+      document.querySelector('#okBtn2').dispatchEvent(new Event('click'));
+      await closePromise;
+    });
+
+    it('dismisses dialog on ESC key, with escDismiss option', async () => {
+      const closePromise = dialogService.open({
+        viewModel: TestDialog,
+        model: { title: 'Test title' },
+        escDismiss: true
+      });
+      await delay();
+
+      await hit({key: 'Escape'});
+
+      try {
+        await closePromise;
+        fail("should not see resolved result");
+      } catch (e) {
+        expect(e.message).toBe('cancelled');
+        expect(dialogService.controllers.length).toBe(0);
+        expect(dialogService.hasActiveDialog).toBe(false);
+      }
+    });
+
+    it('dismisses dialog on ESC key, with escDismiss option set by dialog', async () => {
+      const closePromise = dialogService.open({viewModel: TestDialog2, model: { title: 'Test title', escDismiss: true }});
+      await delay();
+
+      await hit({key: 'Escape'});
+
+      try {
+        await closePromise;
+        fail("should not see resolved result");
+      } catch (e) {
+        expect(e.message).toBe('cancelled');
+        expect(dialogService.controllers.length).toBe(0);
+        expect(dialogService.hasActiveDialog).toBe(false);
+      }
+    });
+  });
+});
