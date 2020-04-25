@@ -25,7 +25,6 @@
     "browser-sync": "^2.26.7",
     "connect-history-api-fallback": "^1.6.0",
     "cross-env": "^7.0.2",
-    "cypress": "^4.3.0",
     "del": "^5.1.0",
     "eslint": "^6.8.0",
     "gulp": "^4.0.2",
@@ -55,11 +54,10 @@
     "build:dev": "gulp clean && gulp build-plugin",
     "build": "gulp clean && cross-env NODE_ENV=production gulp build-plugin",
     "prepare": "npm run build",
-    "SKIPPED-preversion": "npm test",
+    "preversion": "npm test",
     "clear-cache": "gulp clear-cache",
     "test": "browser-do --jasmine < scripts/entry-bundle.js",
     "browser-test": "npm run build:test && browser-do --jasmine --browser chrome < scripts/entry-bundle.js",
-    "test:e2e": "cypress run",
     "version": "standard-changelog && git add CHANGELOG.md",
     "postversion": "git push && git push --tags && npm publish"
   }
