@@ -24,7 +24,6 @@ export class DialogController {
   /**
    * The settings used by this controller.
    */
-  public controller: Controller;
   public dialogOverlay: HTMLElement;
   public closePromise: Promise<any>;
 
@@ -33,12 +32,14 @@ export class DialogController {
    */
   private _resolve: (output?: any) => void;
   private _reject: (reason: Error) => void;
-  private lastActiveElement: HTMLElement;
 
   /**
    * Creates an instance of DialogController.
    */
-  constructor(public settings: DialogSettings) {
+  constructor(
+    public settings: DialogSettings,
+    private _hideDialog: (dialogController: DialogController) => boolean
+  ) {
     this.dialogOverlay = DOM.createElement('div') as HTMLElement;
     this.dialogOverlay.classList.add(settings.overlayClassName);
 
@@ -82,8 +83,7 @@ export class DialogController {
    */
   private close(ok: boolean, output?: any): void {
     // tslint:disable-next-line:no-string-literal
-    if (this.controller['isAttached']) {
-      this.hide();
+    if (this._hideDialog(this)) {
       if (ok) {
         this._resolve(output);
       } else {
@@ -127,53 +127,4 @@ export class DialogController {
       focusableNodes[nextIndex].focus();
     }
   }
-
-  /**
-   * @internal
-   */
-  public show(): void {
-    if (!this.controller) {
-      throw new Error('Cannot show dialog before composing');
-    }
-
-    this.lastActiveElement = DOM.activeElement as HTMLElement;
-    if (this.lastActiveElement) this.lastActiveElement.blur();
-
-    this.settings.host.appendChild(this.dialogOverlay);
-    this.controller.attached();
-    this.setupOverlayDismiss();
-    // trackController(this);
-  }
-
-  /**
-   * @internal
-   */
-  public hide(): void {
-    // untrackController(this);
-    this.clearOverlayDismiss();
-
-    this.settings.host.removeChild(this.dialogOverlay);
-    this.controller.detached();
-    this.controller.unbind();
-    if (this.lastActiveElement) {
-      this.lastActiveElement.focus();
-    }
-  }
-
-  /**
-   * @internal
-   */
-  private setupOverlayDismiss(): void {
-    this.dialogOverlay.addEventListener('click', this.cancelOnOverlay);
-    this.dialogOverlay.addEventListener('touchstart', this.cancelOnOverlay);
-  }
-
-  /**
-   * @internal
-   */
-  private clearOverlayDismiss(): void {
-    this.dialogOverlay.removeEventListener('click', this.cancelOnOverlay);
-    this.dialogOverlay.removeEventListener('touchstart', this.cancelOnOverlay);
-  }
-
 }

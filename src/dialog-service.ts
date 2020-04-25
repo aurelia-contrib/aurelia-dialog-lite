@@ -14,6 +14,12 @@ export class DialogService {
   public controllers: DialogController[] = [];
 
   /**
+   * @internal
+   */
+  private _controllers: Controller[] = [];
+  private _lastActives: HTMLElement[] = [];
+
+  /**
    * Is there an open dialog
    */
   public hasActiveDialog: boolean = false;
@@ -27,6 +33,7 @@ export class DialogService {
     private compositionEngine: CompositionEngine,
     private defaultSettings: DialogSettings) {
     this.escAndTab = this.escAndTab.bind(this);
+    this._hideDialog = this._hideDialog.bind(this);
   }
 
   private composeAndShowDialog(compositionContext: CompositionContext, dialogController: DialogController): Promise<DialogController> {
@@ -37,9 +44,7 @@ export class DialogService {
     return this.compositionEngine
       .compose(compositionContext)
       .then((controller: Controller) => {
-        dialogController.controller = controller;
-        dialogController.show();
-        this.addController(dialogController);
+        this._showDialog(dialogController, controller);
         return dialogController;
       });
   }
@@ -70,11 +75,10 @@ export class DialogService {
     }
 
     const childContainer = this.container.createChild();
-    const dialogController = childContainer.invoke(DialogController, [settings]);
-    childContainer.registerInstance(DialogController, dialogController);
-    dialogController.closePromise.catch(() => null).then(
-      () => this.removeController(dialogController)
+    const dialogController = childContainer.invoke(
+      DialogController, [settings, this._hideDialog]
     );
+    childContainer.registerInstance(DialogController, dialogController);
 
     const compositionContext = {
       container: this.container,
@@ -94,8 +98,19 @@ export class DialogService {
   /**
    * @internal
    */
-  private addController(dialogController: DialogController): void {
+  private _showDialog(dialogController: DialogController, controller: Controller): void {
     this.controllers.push(dialogController);
+    this._controllers.push(controller);
+    const lastActive = DOM.activeElement as HTMLElement;
+    this._lastActives.push(lastActive);
+    if (lastActive) lastActive.blur();
+
+    dialogController.settings.host.appendChild(dialogController.dialogOverlay);
+    controller.attached();
+
+    dialogController.dialogOverlay.addEventListener('click', dialogController.cancelOnOverlay);
+    dialogController.dialogOverlay.addEventListener('touchstart', dialogController.cancelOnOverlay);
+
     if (!this.hasActiveDialog) {
       this.hasActiveDialog = true;
       DOM.addEventListener('keydown', this.escAndTab, false);
@@ -105,15 +120,28 @@ export class DialogService {
   /**
    * @internal
    */
-  private removeController(dialogController: DialogController): void {
+  private _hideDialog(dialogController: DialogController): boolean {
     const i = this.controllers.indexOf(dialogController);
-    if (i !== -1) {
-      this.controllers.splice(i, 1);
-      if (this.controllers.length === 0 && this.hasActiveDialog) {
-        this.hasActiveDialog = false;
-        DOM.removeEventListener('keydown', this.escAndTab, false);
-      }
+    if (i === -1) return false;
+
+    this.controllers.splice(i, 1);
+    const controller = this._controllers.splice(i, 1)[0];
+    const lastActive = this._lastActives.splice(i, 1)[0];
+
+    dialogController.dialogOverlay.removeEventListener('click', dialogController.cancelOnOverlay);
+    dialogController.dialogOverlay.removeEventListener('touchstart', dialogController.cancelOnOverlay);
+
+    dialogController.settings.host.removeChild(dialogController.dialogOverlay);
+    controller.detached();
+    controller.unbind();
+    if (lastActive) lastActive.focus();
+
+    if (this.controllers.length === 0 && this.hasActiveDialog) {
+      this.hasActiveDialog = false;
+      DOM.removeEventListener('keydown', this.escAndTab, false);
     }
+
+    return true;
   }
 
   /**
