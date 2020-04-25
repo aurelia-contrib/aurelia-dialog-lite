@@ -117,6 +117,8 @@ export class DialogController {
     focusableNodes = focusableNodes.filter(node => node.offsetParent);
 
     const active = DOM.activeElement as HTMLElement;
+    // TODO check whether .contains works when there is shadow DOM
+    // inside the dialog. Not a big issue if it doesn't work
     if (!this.dialogOverlay.contains(active)) {
       focusableNodes[0].focus();
     } else {

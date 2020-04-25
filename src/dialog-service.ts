@@ -134,7 +134,17 @@ export class DialogService {
     dialogController.settings.host.removeChild(dialogController.dialogOverlay);
     controller.detached();
     controller.unbind();
-    if (lastActive) lastActive.focus();
+    if (
+      // Only restore last focus if the closed dialog is the top one.
+      i === this.controllers.length &&
+      lastActive &&
+      // Only restore if it's in the DOM tree.
+      // On browsers (e.g. IE) without .isConnected, last focus is
+      // never restored, which is not a big issue.
+      lastActive.isConnected
+    ) {
+      lastActive.focus();
+    }
 
     if (this.controllers.length === 0 && this.hasActiveDialog) {
       this.hasActiveDialog = false;
