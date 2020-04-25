@@ -17,7 +17,7 @@ const css = `.dialog-lite-overlay {
 
 export function configure(
   config: FrameworkConfiguration,
-  settings?: Omit<DialogSettings, 'viewModel' | 'view' | 'model'>
+  settings?: DialogSettings
 ): void | Promise<void> {
   // Put css on top of head, in order to allow easier user override
   DOM.injectStyles(css, DOM.querySelector('head'), true, 'dialog-lite-css');

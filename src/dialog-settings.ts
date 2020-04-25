@@ -6,21 +6,6 @@ import { DOM } from 'aurelia-pal';
  */
 export interface DialogSettings {
   /**
-   * The view model url, constructor or instance for the dialog.
-   */
-  viewModel?: any;
-
-  /**
-   * The view url or view strategy to override the default view location convention.
-   */
-  view?: string | ViewStrategy;
-
-  /**
-   * Data to be passed to the "activate" hook on the view model.
-   */
-  model?: any;
-
-  /**
    * The element that will parent the dialog.
    * Default to document.body.
    */
@@ -44,6 +29,26 @@ export interface DialogSettings {
    * When set to "true" allows for the dismissal of the dialog by clicking outside of it.
    */
   overlayDismiss?: boolean;
+}
+
+/**
+ * All possible dialog context and settings.
+ */
+export interface DialogContextSettings extends DialogSettings {
+  /**
+   * The view model url, constructor or instance for the dialog.
+   */
+  viewModel?: any;
+
+  /**
+   * The view url or view strategy to override the default view location convention.
+   */
+  view?: string | ViewStrategy;
+
+  /**
+   * Data to be passed to the "activate" hook on the view model.
+   */
+  model?: any;
 }
 
 /**

@@ -1,7 +1,7 @@
 import { DOM } from 'aurelia-pal';
 import { Container } from 'aurelia-dependency-injection';
 import { CompositionEngine, Controller, ViewSlot, CompositionContext } from 'aurelia-templating';
-import { DialogSettings, DefaultDialogSettings } from './dialog-settings';
+import { DialogContextSettings, DialogSettings, DefaultDialogSettings } from './dialog-settings';
 import { DialogController } from './dialog-controller';
 
 /**
@@ -55,28 +55,32 @@ export class DialogService {
    * @param settings Dialog settings for this dialog instance.
    * @return Promise A promise that settles when the dialog is closed.
    */
-  public open(settings: DialogSettings = {}): Promise<any> {
-    return this.create(settings).then(
+  public open(contextSettings: DialogContextSettings = {}): Promise<any> {
+    return this.create(contextSettings).then(
       dialogController => dialogController.closePromise
     );
   }
 
   /**
    * Opens a new dialog and resolves to the dialog controller
-   * @param settings Dialog settings for this dialog instance.
+   * @param contextSettings Dialog settings for creating this dialog instance.
    * @return Promise A promise that resolves to a dialog controller.
    */
-  public create(settings: DialogSettings = {}): Promise<DialogController> {
-    settings = Object.assign({}, this.defaultSettings, settings);
-    if (!settings.viewModel && !settings.view) {
+  public create(contextSettings: DialogContextSettings = {}): Promise<DialogController> {
+    const { viewModel, view, model, ...settings } = contextSettings;
+    if (!viewModel && !view) {
       return Promise.reject(
-        new Error('Invalid Dialog Settings. You must provide "viewModel", "view" or both.')
+        new Error('Invalid dialog context settings. You must provide "viewModel", "view" or both.')
       );
     }
 
     const childContainer = this.container.createChild();
     const dialogController = childContainer.invoke(
-      DialogController, [settings, this._hideDialog]
+      DialogController,
+      [
+        Object.assign({}, this.defaultSettings, settings),
+        this._hideDialog
+      ]
     );
     childContainer.registerInstance(DialogController, dialogController);
 
@@ -85,9 +89,9 @@ export class DialogService {
       childContainer,
       bindingContext: null,
       viewResources: null as any,
-      model: settings.model,
-      view: settings.view,
-      viewModel: settings.viewModel,
+      model,
+      view,
+      viewModel,
       viewSlot: new ViewSlot(dialogController.dialogOverlay, true),
       host: dialogController.dialogOverlay
     };
