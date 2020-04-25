@@ -29,6 +29,28 @@ export class TestDialog {
   }
 }
 
+@inlineView(`<template>
+  <div class="dialog">
+    <h2>\${title}</h2>
+    <button id="d2-cancelBtn" click.trigger="controller.cancel('close')">Cancel</button>
+    <button id="d2-okBtn" click.trigger="controller.ok({c:3})">OK</button>
+  </div>
+</template>`)
+@customElement('test-dialog2')
+export class TestDialog2 {
+  public static inject = [DialogController];
+  public title: string;
+
+  constructor(public controller: DialogController) {
+    this.controller.settings.overlayDismiss = true;
+    this.controller.settings.escDismiss = true;
+  }
+
+  public activate(model: any) {
+    this.title = model.title as string;
+  }
+}
+
 async function delay(ms: number = 20) {
   return new Promise(resolve => {
     setTimeout(resolve, ms);
@@ -454,6 +476,137 @@ describe('DialogService', () => {
       expect(dialogService.controllers.length).toBe(0);
       expect(dialogService.hasActiveDialog).toBe(false);
     });
-  })
+
+    it('traps focus in stacks of dialogs', async () => {
+      expect(document.activeElement).toBe(btn);
+
+      const closePromise = dialogService.open({viewModel: TestDialog, model: { title: 'Test title'}});
+      await delay();
+
+      // dialogService resets focus.
+      expect(document.activeElement).toBe(document.body);
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('cancelBtn');
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('cancelBtn2');
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('okBtn');
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('okBtn2');
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('cancelBtn');
+      await hit({key: 'Tab', shiftKey: true});
+      expect(document.activeElement.id).toBe('okBtn2');
+      await hit({key: 'Tab', shiftKey: true});
+      expect(document.activeElement.id).toBe('okBtn');
+      await hit({key: 'Tab', shiftKey: true});
+      expect(document.activeElement.id).toBe('cancelBtn2');
+      await hit({key: 'Tab', shiftKey: true});
+      expect(document.activeElement.id).toBe('cancelBtn');
+      await hit({key: 'Tab'});
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('okBtn');
+
+      const closePromise2 = dialogService.open({viewModel: TestDialog2, model: { title: 'Test title2'}});
+      await delay();
+
+      expect(dialogService.controllers.length).toBe(2);
+      expect(dialogService.hasActiveDialog).toBe(true);
+
+      let overlays = document.querySelectorAll('.dialog-lite-overlay');
+      expect(overlays.length).toBe(2);
+      expect(overlays[0].querySelector('h2').textContent).toBe('Test title');
+      expect(overlays[1].querySelector('h2').textContent).toBe('Test title2');
+
+      // dialogService resets focus.
+      expect(document.activeElement).toBe(document.body);
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('d2-cancelBtn');
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('d2-okBtn');
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('d2-cancelBtn');
+      await hit({key: 'Tab', shiftKey: true});
+      expect(document.activeElement.id).toBe('d2-okBtn');
+      await hit({key: 'Tab', shiftKey: true});
+      expect(document.activeElement.id).toBe('d2-cancelBtn');
+
+      document.activeElement.dispatchEvent(new Event('click'));
+
+      try {
+        await closePromise2;
+        fail("should not see resolved result");
+      } catch (e) {
+        expect(e.message).toBe('close');
+      }
+      // dialogService restores previous focus.
+      expect(document.activeElement.id).toBe('okBtn');
+
+      expect(dialogService.controllers.length).toBe(1);
+      expect(dialogService.hasActiveDialog).toBe(true);
+
+      overlays = document.querySelectorAll('.dialog-lite-overlay');
+      expect(overlays.length).toBe(1);
+      expect(overlays[0].querySelector('h2').textContent).toBe('Test title');
+
+      // focus on #okBtn
+      // Don't know what to simulate Enter or Space to let
+      // browser fire click event (default behavior).
+      // Just fire a click event here.
+      document.activeElement.dispatchEvent(new Event('click'));
+
+      const result = await closePromise;
+      // dialogService restores focus.
+      expect(document.activeElement).toBe(btn);
+
+      expect(result).toBeUndefined();
+      expect(dialogService.controllers.length).toBe(0);
+      expect(dialogService.hasActiveDialog).toBe(false);
+    });
+
+
+    it('traps focus in stacks of dialogs, but does not restore focus to detached dom', async () => {
+      expect(document.activeElement).toBe(btn);
+
+      const dialogController = await dialogService.create({viewModel: TestDialog, model: { title: 'Test title'}});
+
+      // dialogService resets focus.
+      expect(document.activeElement).toBe(document.body);
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('cancelBtn');
+
+      const dialogController2 = await dialogService.create({viewModel: TestDialog2, model: { title: 'Test title2'}});
+
+      // dialogService resets focus.
+      expect(document.activeElement).toBe(document.body);
+      await hit({key: 'Tab'});
+      expect(document.activeElement.id).toBe('d2-cancelBtn');
+
+      // close first dialog first
+      dialogController.ok();
+      await delay();
+      // don't touch top dialog focus.
+      expect(document.activeElement.id).toBe('d2-cancelBtn');
+
+      expect(dialogService.controllers.length).toBe(1);
+      expect(dialogService.hasActiveDialog).toBe(true);
+
+      let overlays = document.querySelectorAll('.dialog-lite-overlay');
+      expect(overlays.length).toBe(1);
+      expect(overlays[0].querySelector('h2').textContent).toBe('Test title2');
+
+      // close top dialog
+      dialogController2.ok();
+      await delay();
+
+      // cannot restores focus to detached dialog.
+      expect(document.activeElement).toBe(document.body);
+
+      expect(dialogService.controllers.length).toBe(0);
+      expect(dialogService.hasActiveDialog).toBe(false);
+      overlays = document.querySelectorAll('.dialog-lite-overlay');
+      expect(overlays.length).toBe(0);
+    });
+  });
 });
 
