@@ -55,15 +55,15 @@ export class DialogController {
 
   /**
    * Closes the dialog with a successful output.
-   * @param output The returned success output.
+   * @param output The returned success output in closePromise.
    */
   public ok(output?: any): void {
     this.close(true, output);
   }
 
   /**
-   * Closes the dialog with a cancel output.
-   * @param output The returned cancel output.
+   * Cancels the dialog with a optional reason.
+   * @param reason The returned cancel reason in closePromise.
    */
   public cancel(reason: string = 'cancelled'): void {
     this.close(false, new Error(reason));

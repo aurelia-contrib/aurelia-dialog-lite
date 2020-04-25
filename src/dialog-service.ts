@@ -64,7 +64,7 @@ export class DialogService {
   /**
    * Opens a new dialog and resolves to the dialog controller
    * @param settings Dialog settings for this dialog instance.
-   * @return Promise A promise that resolves to dialog controller.
+   * @return Promise A promise that resolves to a dialog controller.
    */
   public create(settings: DialogSettings = {}): Promise<DialogController> {
     settings = Object.assign({}, this.defaultSettings, settings);
