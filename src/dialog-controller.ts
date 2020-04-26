@@ -41,7 +41,7 @@ export class DialogController {
     private _hideDialog: (dialogController: DialogController) => boolean
   ) {
     this.dialogOverlay = DOM.createElement('div') as HTMLElement;
-    this.dialogOverlay.classList.add(settings.overlayClassName);
+    this.dialogOverlay.className = settings.overlayClassName;
 
     this.closePromise = new Promise<any>((resolve, reject) => {
       this._resolve = resolve;
