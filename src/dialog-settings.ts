@@ -15,11 +15,12 @@ export interface DialogSettings {
    * The CSS class name for the overlay element.
    * An overlay element is created for every dialog, it hosts dialog view.
    * When showing the dialog its overlay element is inserted to host element.
+   * Default to 'dialog-lite-overlay'.
    */
   overlayClassName?: string;
 
   /**
-   * Allows for closing the top most dialog via the keyboard.
+   * Allows for closing the top most dialog via the keyboard ESC key.
    * When set to "false" no action will be taken.
    * When set to "true" the dialog will be "cancel" closed when the ESC key is pressed.
    */
