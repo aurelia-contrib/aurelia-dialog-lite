@@ -653,7 +653,7 @@ describe('DialogService', () => {
     });
 
     it('dismisses dialog on ESC key, with escDismiss option set by dialog', async () => {
-      const closePromise = dialogService.open({viewModel: TestDialog2, model: { title: 'Test title', escDismiss: true }});
+      const closePromise = dialogService.open({viewModel: TestDialog2, model: { title: 'Test title' }});
       await delay();
 
       await hit({key: 'Escape'});
@@ -667,5 +667,82 @@ describe('DialogService', () => {
         expect(dialogService.hasActiveDialog).toBe(false);
       }
     });
+  });
+
+  describe('overlay dismiss', () => {
+    it('by default does not dismiss dialog on overlay click', async () => {
+      const closePromise = dialogService.open({viewModel: TestDialog, model: { title: 'Test title'}});
+      await delay();
+
+      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('click'));
+      await delay();
+
+      expect(dialogService.controllers.length).toBe(1);
+      expect(dialogService.hasActiveDialog).toBe(true);
+
+      document.querySelector('#okBtn2').dispatchEvent(new Event('click'));
+      await closePromise;
+    });
+
+    it('dismisses dialog on overlay click, with overlayDismiss option', async () => {
+      const closePromise = dialogService.open({
+        viewModel: TestDialog,
+        model: { title: 'Test title' },
+        overlayDismiss: true
+      });
+      await delay();
+
+      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('click'));
+      await delay();
+
+      try {
+        await closePromise;
+        fail("should not see resolved result");
+      } catch (e) {
+        expect(e.message).toBe('cancelled');
+        expect(dialogService.controllers.length).toBe(0);
+        expect(dialogService.hasActiveDialog).toBe(false);
+      }
+    });
+
+    it('dismisses dialog on overlay click, with overlayDismiss option set by dialog', async () => {
+      const closePromise = dialogService.open({viewModel: TestDialog2, model: { title: 'Test title' }});
+      await delay();
+
+      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('click'));
+      await delay();
+
+      try {
+        await closePromise;
+        fail("should not see resolved result");
+      } catch (e) {
+        expect(e.message).toBe('cancelled');
+        expect(dialogService.controllers.length).toBe(0);
+        expect(dialogService.hasActiveDialog).toBe(false);
+      }
+    });
+
+    it('dismisses dialog on overlay click, with overlayDismiss option, with custom overlayClassName', async () => {
+      const closePromise = dialogService.open({
+        viewModel: TestDialog,
+        model: { title: 'Test title' },
+        overlayDismiss: true,
+        overlayClassName: 'dialog-lite-overlay my-overlay'
+      });
+      await delay();
+
+      document.querySelector('.dialog-lite-overlay.my-overlay').dispatchEvent(new Event('click'));
+      await delay();
+
+      try {
+        await closePromise;
+        fail("should not see resolved result");
+      } catch (e) {
+        expect(e.message).toBe('cancelled');
+        expect(dialogService.controllers.length).toBe(0);
+        expect(dialogService.hasActiveDialog).toBe(false);
+      }
+    });
+
   });
 });
