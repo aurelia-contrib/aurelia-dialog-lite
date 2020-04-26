@@ -667,6 +667,57 @@ describe('DialogService', () => {
         expect(dialogService.hasActiveDialog).toBe(false);
       }
     });
+
+    it('dismisses correct dialog on stacks', async () => {
+      const closePromise = dialogService.open({
+        viewModel: TestDialog,
+        model: { title: 'Test title' },
+        escDismiss: true
+      });
+      await delay();
+
+      const closePromise2 = dialogService.open({
+        viewModel: TestDialog2,
+        model: { title: 'Test title2' }
+      });
+      await delay();
+
+      expect(dialogService.controllers.length).toBe(2);
+      expect(dialogService.hasActiveDialog).toBe(true);
+
+      let overlays = document.querySelectorAll('.dialog-lite-overlay');
+      expect(overlays.length).toBe(2);
+      expect(overlays[1].querySelector('h2').textContent).toBe('Test title2');
+
+      // cancel top dialog
+      await hit({key: 'Escape'});
+
+      try {
+        await closePromise2;
+        fail("should not see resolved result");
+      } catch (e) {
+        expect(e.message).toBe('cancelled');
+      }
+
+      expect(dialogService.controllers.length).toBe(1);
+      expect(dialogService.hasActiveDialog).toBe(true);
+      overlays = document.querySelectorAll('.dialog-lite-overlay');
+      expect(overlays.length).toBe(1);
+      expect(overlays[0].querySelector('h2').textContent).toBe('Test title');
+
+      // cancel first dialog
+      await hit({key: 'Escape'});
+
+      try {
+        await closePromise;
+        fail("should not see resolved result");
+      } catch (e) {
+        expect(e.message).toBe('cancelled');
+      }
+
+      expect(dialogService.controllers.length).toBe(0);
+      expect(dialogService.hasActiveDialog).toBe(false);
+    });
   });
 
   describe('overlay dismiss', () => {
@@ -744,5 +795,54 @@ describe('DialogService', () => {
       }
     });
 
+    it('dismisses correct dialog on stacks', async () => {
+      const closePromise = dialogService.open({
+        viewModel: TestDialog,
+        model: { title: 'Test title' },
+        overlayDismiss: true
+      });
+      await delay();
+
+      const closePromise2 = dialogService.open({
+        viewModel: TestDialog2,
+        model: { title: 'Test title2' }
+      });
+      await delay();
+
+      expect(dialogService.controllers.length).toBe(2);
+      expect(dialogService.hasActiveDialog).toBe(true);
+      let overlays = document.querySelectorAll('.dialog-lite-overlay');
+      expect(overlays.length).toBe(2);
+      expect(overlays[1].querySelector('h2').textContent).toBe('Test title2');
+
+      // cancel top dialog
+      document.querySelectorAll('.dialog-lite-overlay')[1].dispatchEvent(new Event('click'));
+
+      try {
+        await closePromise2;
+        fail("should not see resolved result");
+      } catch (e) {
+        expect(e.message).toBe('cancelled');
+      }
+
+      expect(dialogService.controllers.length).toBe(1);
+      expect(dialogService.hasActiveDialog).toBe(true);
+      overlays = document.querySelectorAll('.dialog-lite-overlay');
+      expect(overlays.length).toBe(1);
+      expect(overlays[0].querySelector('h2').textContent).toBe('Test title');
+
+      // cancel first dialog
+      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('click'));
+
+      try {
+        await closePromise;
+        fail("should not see resolved result");
+      } catch (e) {
+        expect(e.message).toBe('cancelled');
+      }
+
+      expect(dialogService.controllers.length).toBe(0);
+      expect(dialogService.hasActiveDialog).toBe(false);
+    });
   });
 });
