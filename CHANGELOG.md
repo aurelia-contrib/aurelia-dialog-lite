@@ -1,3 +1,22 @@
+# [0.2.0](https://github.com/3cp/aurelia-dialog-lite/compare/v0.1.2...v0.2.0) (2020-04-26)
+
+
+### Bug Fixes
+
+* support overlayClassName with spaces ([4c7b296](https://github.com/3cp/aurelia-dialog-lite/commit/4c7b296a32e4b0edaafef00ebfcead57371e56db))
+
+
+### Features
+
+* simplify implementation and APIs ([1a32e00](https://github.com/3cp/aurelia-dialog-lite/commit/1a32e00f20d374deb8beb7606deac1990597f61d))
+
+
+### BREAKING CHANGES
+
+* APIs are re-designed from the original aurelia-dialog.
+
+
+
 ## [0.1.2](https://github.com/3cp/aurelia-dialog-lite/compare/v0.1.1...v0.1.2) (2020-04-22)
 
 
