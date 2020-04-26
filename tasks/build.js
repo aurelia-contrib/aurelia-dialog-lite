@@ -3,7 +3,6 @@ const typescript = require('gulp-typescript');
 const plumber = require('gulp-plumber');
 const merge2 = require('merge2');
 const postcss = require('gulp-postcss');
-const terser = require('gulp-terser');
 const gulpif = require('gulp-if');
 const autoprefixer = require('autoprefixer');
 const postcssUrl = require('postcss-url');
@@ -51,11 +50,6 @@ function build() {
   // dumber here consumes (swallows) all incoming Vinyl files,
   // then generates new Vinyl files for all output bundle files.
   .pipe(dr())
-
-  // Terser fast minify mode
-  // https://github.com/terser-js/terser#terser-fast-minify-mode
-  // It's a good balance on size and speed to turn off compress.
-  .pipe(gulpif(isProduction, terser({compress: false})))
   .pipe(gulp.dest(outputDir, {sourcemaps: isProduction ? false : (isTest ? true : '.')}));
 }
 
