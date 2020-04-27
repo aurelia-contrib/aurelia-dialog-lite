@@ -1,4 +1,6 @@
-# aurelia-dialog-lite
+# aurelia-dialog-lite ![CI](https://github.com/3cp/aurelia-dialog-lite/workflows/CI/badge.svg)
+
+A very lite Aurelia dialog plugin.
 
 This project is a cut-off version of original [aurelia-dialog](https://github.com/aurelia/dialog), with added focus-trap from [Micromodal](https://github.com/ghosh/Micromodal).
 
@@ -12,14 +14,14 @@ This project is a cut-off version of original [aurelia-dialog](https://github.co
 
 If aurelia-dialog did not trouble you. Don't migrate.
 
-You might want to give aurelia-dialog-lite a try because of the above listed changes, especially for the CSS and layout.
+For users who absolutely need proper focus trap, or have strong need for the CSS customization, aurelia-dialog-lite is a good fit.
 
 ## Guide
 
 * [Installation](#install)
 * [Simplified layout](#simplified-layout)
 * [Basic usage](#basic-usage)
-* [Customise dialog settings](#customise-dialog-settings)
+* [Customise settings](#customise-settings)
 * [Advanced usage](#advanced-usage)
   * [Programmatically close a dialog](#programmatically-close-dialog)
   * [View only dialog](#view-only-dialog)
@@ -202,9 +204,11 @@ export class TestDialog {
 * `controller.cancel(reason: string = 'cancelled')` supports an optional reason for the cancellation. Default to `"cancelled"`. You can get it out from the rejected `err.message` following `dialogService.open()`.
 * `controller.ok(output?: any)` supports an optional output for the resolution. You get get it out from the resolved output following `dialogService.open()`.
 
-TODO demo links
+| Demo | | |
+| :-- | :-- | :-- |
+| Baisc usage | [ESNext](https://gist.dumber.app/?gist=75c60c9c5e7ff201b103b49f14dabbe7&open=src%2Fapp.js&open=src%2Fapp.scss&open=src%2Ftest-dialog.js&open=src%2Ftest-dialog.html) | [TypeScript](https://gist.dumber.app/?gist=8e2f13d8e39798449bfbb879c5477837&open=src%2Fapp.ts&open=src%2Fapp.scss&open=src%2Ftest-dialog.ts&open=src%2Ftest-dialog.html) |
 
-### Customise dialog settings
+### Customise settings
 
 On top of the global settings through `aurelia.use.plugin()`, there are two more places you can customise the dialog settings per dialog.
 
@@ -227,6 +231,10 @@ export class TestDialog {
 ```
 
 The injected dialog controller instance is unique per dialog. Customise the settings in constructor so that the later rendering will honour the changed settings.
+
+| Demo | dialogService.open | dialog constructor |
+| :-- | :-- | :-- |
+| Customise settings | [ESNext](https://gist.dumber.app/?gist=8a7b030335b599a1df4fbbd6d710e8d2&open=src%2Fapp.js) | [TypeScript](https://gist.dumber.app/?gist=426abe0d73c6daa0f5ae7541760260bd&open=src%2Ftest-dialog.ts) |
 
 ### Advanced usage
 
