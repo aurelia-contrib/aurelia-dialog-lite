@@ -226,11 +226,22 @@ You can customise `host`, `overlayClassName`, `escDismiss`, and `overlayDismiss`
 export class TestDialog {
   constructor(controller) {
     this.controller = controller;
-    this.controller.settings.overlayDismiss = true;
+    this.controller.overlayDismiss = true;
   }
 ```
 
 The injected dialog controller instance is unique per dialog. Customise the settings in constructor so that the later rendering will honour the changed settings.
+
+Note the API is simplified from the original aurelia-dialig:
+
+aurelia-dialog
+```js
+this.controller.settings.overlayDismiss = true;
+```
+aurelia-dialog-lite
+```js
+this.controller.overlayDismiss = true;
+```
 
 | Demo | dialogService.open | dialog constructor |
 | :-- | :-- | :-- |

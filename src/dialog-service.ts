@@ -109,7 +109,7 @@ export class DialogService {
     this._lastActives.push(lastActive);
     if (lastActive) lastActive.blur();
 
-    dialogController.settings.host.appendChild(dialogController.dialogOverlay);
+    dialogController.host.appendChild(dialogController.dialogOverlay);
     controller.attached();
 
     dialogController.dialogOverlay.addEventListener('click', dialogController.cancelOnOverlay);
@@ -135,7 +135,7 @@ export class DialogService {
     dialogController.dialogOverlay.removeEventListener('click', dialogController.cancelOnOverlay);
     dialogController.dialogOverlay.removeEventListener('touchstart', dialogController.cancelOnOverlay);
 
-    dialogController.settings.host.removeChild(dialogController.dialogOverlay);
+    dialogController.host.removeChild(dialogController.dialogOverlay);
     controller.detached();
     controller.unbind();
     if (
@@ -167,7 +167,7 @@ export class DialogService {
     if (!top) return;
     if (key === 'Tab') {
       top.retainFocus(e);
-    } else if (key === 'Escape' && top.settings.escDismiss) {
+    } else if (key === 'Escape' && top.escDismiss) {
       top.cancel();
     }
   }

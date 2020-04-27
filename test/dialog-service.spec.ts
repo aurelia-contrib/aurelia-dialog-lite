@@ -53,8 +53,8 @@ export class TestDialog2 {
   public title: string;
 
   constructor(public controller: DialogController) {
-    this.controller.settings.overlayDismiss = true;
-    this.controller.settings.escDismiss = true;
+    this.controller.overlayDismiss = true;
+    this.controller.escDismiss = true;
   }
 
   public activate(model: any) {

@@ -20,12 +20,16 @@ const FOCUSABLE_ELEMENTS = [
 /**
  * A controller object for a Dialog instance.
  */
-export class DialogController {
+export class DialogController implements DialogSettings {
   /**
    * The settings used by this controller.
    */
   public dialogOverlay: HTMLElement;
   public closePromise: Promise<any>;
+  public host: HTMLBodyElement;
+  public overlayClassName: string;
+  public escDismiss: boolean;
+  public overlayDismiss: boolean;
 
   /**
    * @internal
@@ -40,8 +44,9 @@ export class DialogController {
     public settings: DialogSettings,
     private _hideDialog: (dialogController: DialogController) => boolean
   ) {
+    Object.assign(this, settings);
     this.dialogOverlay = DOM.createElement('div') as HTMLElement;
-    this.dialogOverlay.className = settings.overlayClassName;
+    this.dialogOverlay.className = this.overlayClassName;
 
     this.closePromise = new Promise<any>((resolve, reject) => {
       this._resolve = resolve;
@@ -73,7 +78,7 @@ export class DialogController {
    * @internal
    */
   public cancelOnOverlay(event: Event): void {
-    if (this.settings.overlayDismiss && event.target === this.dialogOverlay) {
+    if (this.overlayDismiss && event.target === this.dialogOverlay) {
       this.cancel();
     }
   }
