@@ -1,5 +1,6 @@
 {
   "name": "aurelia-dialog-lite",
+  "version": "0.3.0",
   "description": "A lite dialog plugin for Aurelia.",
   "keywords": [
     "aurelia",
@@ -11,8 +12,15 @@
   "files": [
     "dist"
   ],
-  "version": "0.3.0",
   "license": "MIT",
+  "homepage": "https://github.com/3cp/aurelia-dialog-lite",
+  "bugs": {
+    "url": "https://github.com/3cp/aurelia-dialog-lite/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/3cp/aurelia-dialog-lite"
+  },
   "devDependencies": {
     "@types/jasmine": "^3.5.10",
     "@types/node": "^13.11.0",
