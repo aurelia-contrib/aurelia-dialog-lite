@@ -1,3 +1,17 @@
+# [0.3.0](https://github.com/3cp/aurelia-dialog-lite/compare/v0.2.0...v0.3.0) (2020-04-28)
+
+
+### Features
+
+* simplify controller settings API ([d8696b4](https://github.com/3cp/aurelia-dialog-lite/commit/d8696b4fb79816a084aca4fc60e17b46906c91dd))
+
+
+### BREAKING CHANGES
+
+* changed from original aurelia-dialog APIs
+
+
+
 # [0.2.0](https://github.com/3cp/aurelia-dialog-lite/compare/v0.1.2...v0.2.0) (2020-04-26)
 
 
