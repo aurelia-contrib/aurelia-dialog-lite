@@ -172,7 +172,7 @@ export class MyComponent {
 
 Or use async/await
 ```js
-showTestDialog() {
+async showTestDialog() {
   try {
     const output = await this.dialogService.open({
       viewModel: TestDialog,
