@@ -26,7 +26,7 @@ For users who absolutely need proper focus trap, or have strong need for the CSS
   * [Programmatically close a dialog](#programmatically-close-dialog)
   * [View only dialog](#view-only-dialog)
   * [Dialog with multiple view templates](#dialog-with-multiple-view-templates)
-* [Tips](#tips)
+* [Recipes](#recipes)
   * [z-index](#z-index)
   * [Enter key](#enter-key)
   * [Position through CSS](#position-through-css)
@@ -170,6 +170,22 @@ export class MyComponent {
 }
 ```
 
+Or use async/await
+```js
+showTestDialog() {
+  try {
+    const output = await this.dialogService.open({
+      viewModel: TestDialog,
+      model: { title: 'Test dialog' }
+    });
+    // ...
+  } catch (err) {
+    // cancelled
+  )
+}
+```
+
+
 > Note different from original aurelia-dialog, we simply return dialog closePromise. It either resolves to an output, or rejects to an cancellation error which you can ignore most of the time.
 
 * **viewModel** is the dialog implementation.
@@ -190,6 +206,7 @@ export class TestDialog {
     this.controller = controller;
   }
 
+  // The model set by dialogService.open()
   activate(model) {
     this.title = model.title;
   }
@@ -232,6 +249,7 @@ export class TestDialog {
     this.controller = controller;
     this.controller.overlayDismiss = true;
   }
+}
 ```
 
 The injected dialog controller instance is unique per dialog. Customise the settings in constructor so that the later rendering will honour the changed settings.
@@ -254,15 +272,63 @@ this.controller.overlayDismiss = true;
 ### Advanced usage
 
 #### Programmatically close a dialog
-TODO `dialogService.create()`, demo auto close of a dialog.
+
+API `dialogService.create()` is similar to `dialogService.open()`, but it returns a promise that resolves to new dialog controller, so you can control the dialog from outside.
+
+In fact, `dialogService.open()` is simplify implemented through `dialogService.create()`.
+```ts
+public open(contextSettings: DialogContextSettings = {}): Promise<any> {
+  return this.create(contextSettings).then(
+    dialogController => dialogController.closePromise
+  );
+}
+```
+
+After you got the dialog controller from `dialogService.create()`, you can use `controller.ok(...)` or `controller.cancel()` to close the dialog based on what happened outside of the dialog (e.g. a remote update).
+
+```js
+this.dialogService.create({...})
+  .then(controller => {
+    // you can later call controller.ok(...) or controller.cancel()
+    // to close the dialog from outside.
+  }
+```
+Or async/await
+```js
+const controller = await this.dialogService.create({...});
+// ...
+```
+
+Following demo shows how to use dialog controller to close the dialog from outside. It also demonstrate native bootstrap modal layout inside aurelia-dialog-lite.
+
+Note technically the delayed closure can be implemented in the dialog class itself. We only use delayed closure as a simple example of controlling dialog from outside.
+
+| Demo | | |
+| :-- | :-- | :-- |
+| Programmatically close dialog | [ESNext](https://gist.dumber.app/?gist=1f04458dda868ab50e367f9ba8f7690e&open=src%2Fapp.js&open=src%2Fapp.html&open=src%2Fconfirm-dialog.js&open=src%2Fconfirm-dialog.html) | [TypeScript](https://gist.dumber.app/?gist=9739b6908b60770dd001d22aeb9f3bf5&open=src%2Fapp.ts&open=src%2Fapp.html&open=src%2Fconfirm-dialog.ts&open=src%2Fconfirm-dialog.html) |
 
 #### View only dialog
 
 #### Dialog with multiple view templates
 
-### Tips
+#### dialogSerivce.hasActiveDialog and dialogSerivce.controllers
+
+DialogService exposes the controllers of the active dialogs through `dialogSerivce.controllers`, you can manually call `ok()` or `cancel()` on one or more of the controllers. It also exposes a simple boolean flag `dialogSerivce.hasActiveDialog` which is only `true` when there is at least one active dialog.
+
+### Recipes
 
 #### z-index
+
+aurelia-dialog-lite does not provide an option to set starting z-index. Just put an z-index in your CSS directly. For example set to 1040 as same as boostrap's modal backdrop.
+
+```css
+.dialog-lite-overlay {
+  z-index: 1040;
+  /* if you have a customised bootstrap scss
+  z-index: $zindex-modal-backdrop;
+  */
+}
+```
 
 #### Enter key
 TODO Enter key with aurelia-combo, why we removed the feature from aurelia-dialog-lite due to edge cases.
