@@ -10,9 +10,9 @@ This project is a cut-off version of original [aurelia-dialog](https://github.co
 2. give users total control on CSS and layout.
 3. properly trap focus, prevent users from using Tab and Enter to hit button/anchor on the background DOM behind the active dialog.
 
-## Should I migrate to aurelia-dialog-lite?
+### Should I migrate to aurelia-dialog-lite?
 
-If aurelia-dialog did not trouble you. Don't migrate.
+There are breaking changes, if aurelia-dialog did not trouble you, don't migrate.
 
 For users who absolutely need proper focus trap, or have strong need for the CSS customization, aurelia-dialog-lite is a good fit.
 
@@ -23,7 +23,7 @@ For users who absolutely need proper focus trap, or have strong need for the CSS
 * [Basic usage](#basic-usage)
 * [Customise settings](#customise-settings)
 * [Advanced usage](#advanced-usage)
-  * [Programmatically close a dialog](#programmatically-close-dialog)
+  * [Programmatically close a dialog](#programmatically-close-a-dialog)
   * [View only dialog](#view-only-dialog)
   * [Dialog with multiple view templates](#dialog-with-multiple-view-templates)
 * [Recipes](#recipes)
