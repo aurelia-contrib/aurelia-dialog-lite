@@ -6,7 +6,7 @@ This project is a cut-off version of original [aurelia-dialog](https://github.co
 
 ## What's changed from original aurelia-dialog?
 
-1. removed lots of features, simplified APIs (incompatible).
+1. removed most of the features, simplified APIs (incompatible).
 2. give users total control on CSS and layout.
 3. properly trap focus, prevent users from using Tab and Enter to hit button/anchor on the background DOM behind the active dialog.
 
@@ -18,7 +18,7 @@ For users who absolutely need proper focus trap, or have strong need for the CSS
 
 ## Guide
 
-* [Installation](#install)
+* [Install and config](#install-and-config)
 * [Simplified layout](#simplified-layout)
 * [Basic usage](#basic-usage)
 * [Customise settings](#customise-settings)
@@ -32,7 +32,7 @@ For users who absolutely need proper focus trap, or have strong need for the CSS
   * [Position through CSS](#position-through-css)
   * [Transition and animation](#transition-and-animation)
 
-### Installation
+### Install and config
 
 ```bash
 npm i aurelia-dialog-lite
@@ -65,7 +65,11 @@ aurelia.use.plugin(PLATFORM.moduleName('aurelia-dialog-lite'), {
 * **escDismiss** allows for closing the dialog via the keyboard ESC key.
 * **overlayDismiss** allows for closing the dialog via clicking the overlay element.
 
+They are the only settings available in aurelia-dialog-lite.
+
 ### Simplified layout
+
+Before getting into the code, it's better to understand how aurelia-dialog-lite renders the dialogs.
 
 For a dialog with following HTML template:
 ```html
@@ -81,7 +85,7 @@ aurelia-dialog-lite inserts following to the `host` element (default to HTML bod
 ```html
 <body>
   ...
-  <!-- following is appended to body by aurelia-dialog-lite -->
+  <!-- following is appended by aurelia-dialog-lite -->
   <div class="dialog-lite-overlay">
     <div class="my-dialog">
       ...
@@ -102,7 +106,7 @@ Imaging aurelia-dialog-lite only changes the `<template>` in your dialog HTML te
 
 #### Simplified CSS
 
-The default CSS for the overlay element is quite simple. It covers the full screen, uses flex layout to centre the user dialog.
+The default CSS for the overlay element is quite simple. It covers the full screen, uses flex layout to centre the user dialog. The following is all of aurelia-dialog-lite's CSS (injected to HTML head automatically).
 
 ```css
 .dialog-lite-overlay {
@@ -128,9 +132,9 @@ aurelia-dialog-lite injects the above CSS piece onto the very beginning of the H
 
 ### Basic usage
 
-Inject `DialogService` to your view module.
+Inject `DialogService` to your view model.
 
-> This guide shows all code examples in ESNext. It's very similar in TypeScript. At the end of this section, all the runnable code demos have both ESNext and TypeScript versions.
+> Following guide shows all code examples in ESNext. It's very similar in TypeScript. At the end of each section, all the runnable code demos have both ESNext and TypeScript versions.
 
 ```js
 import {inject} from 'aurelia-framework';
