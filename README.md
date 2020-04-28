@@ -32,7 +32,7 @@ For users who absolutely need proper focus trap, or have strong need for the CSS
   * [Position through CSS](#position-through-css)
   * [Transition and animation](#transition-and-animation)
 
-### Install and config
+## Install and config
 
 ```bash
 npm i aurelia-dialog-lite
@@ -67,7 +67,7 @@ aurelia.use.plugin(PLATFORM.moduleName('aurelia-dialog-lite'), {
 
 They are the only settings available in aurelia-dialog-lite.
 
-### Simplified layout
+## Simplified layout
 
 Before getting into the code, it's better to understand how aurelia-dialog-lite renders the dialogs.
 
@@ -104,7 +104,7 @@ Imaging aurelia-dialog-lite only changes the `<template>` in your dialog HTML te
 
 > Original aurelia-dialog creates lots of DOM layers above your actual dialog, making CSS customization quite difficult.
 
-#### Simplified CSS
+### Simplified CSS
 
 The default CSS for the overlay element is quite simple. It covers the full screen, uses flex layout to centre the user dialog. The following is all of aurelia-dialog-lite's CSS (injected to HTML head automatically).
 
@@ -130,7 +130,7 @@ aurelia-dialog-lite injects the above CSS piece onto the very beginning of the H
 
 > Original aurelia-dialog supports few custom elements: `<ux-dialog>`, `<ux-dialog-header>`, `<ux-dialog-body>`, `<ux-dialog-footer>`, and one custom attribute `attach-focus`. **They are all removed from aurelia-dialog-lite.**
 
-### Basic usage
+## Basic usage
 
 Inject `DialogService` to your view model.
 
@@ -192,7 +192,7 @@ showTestDialog() {
 * **view** is the optional HTML template for the dialog. Only for non-default HTML template file, or view only dialog implementation. See [advanced usage](#advanced-usage) for more details.
 * **model** is an optional model object which will be passed to `activate(model?: any)` lifecycle callback of the dialog.
 
-#### Implement a dialog
+### Implement a dialog
 
 In dialog, inject `DialogController` so that you can call `controller.cancel()` or `controller.ok()` later.
 
@@ -229,11 +229,11 @@ export class TestDialog {
 | :-- | :-- | :-- |
 | Baisc usage | [ESNext](https://gist.dumber.app/?gist=75c60c9c5e7ff201b103b49f14dabbe7&open=src%2Fapp.js&open=src%2Fapp.scss&open=src%2Ftest-dialog.js&open=src%2Ftest-dialog.html) | [TypeScript](https://gist.dumber.app/?gist=8e2f13d8e39798449bfbb879c5477837&open=src%2Fapp.ts&open=src%2Fapp.scss&open=src%2Ftest-dialog.ts&open=src%2Ftest-dialog.html) |
 
-### Customise settings
+## Customise settings
 
 On top of the global settings through `aurelia.use.plugin()`, there are two more places you can customise the dialog settings per dialog.
 
-#### 1. in `dialogService.open()` and `dialogService.create()` (showing in next section).
+### 1. in `dialogService.open()` and `dialogService.create()` (showing in next section).
 ```js
 this.dialogService.open({
   viewModel: TestDialog,
@@ -242,7 +242,7 @@ this.dialogService.open({
 ```
 You can customise `host`, `overlayClassName`, `escDismiss`, and `overlayDismiss`. **All the options are customisable per dialog.**
 
-#### 2. in dialog implementation constructor
+### 2. in dialog implementation constructor
 ```js
 export class TestDialog {
   constructor(controller) {
@@ -269,9 +269,9 @@ this.controller.overlayDismiss = true;
 | :-- | :-- | :-- |
 | Customise settings | [ESNext](https://gist.dumber.app/?gist=8a7b030335b599a1df4fbbd6d710e8d2&open=src%2Fapp.js) | [TypeScript](https://gist.dumber.app/?gist=426abe0d73c6daa0f5ae7541760260bd&open=src%2Ftest-dialog.ts) |
 
-### Advanced usage
+## Advanced usage
 
-#### Programmatically close a dialog
+### Programmatically close a dialog
 
 API `dialogService.create()` is similar to `dialogService.open()`, but it returns a promise that resolves to new dialog controller, so you can control the dialog from outside.
 
@@ -307,17 +307,17 @@ Note technically the delayed closure can be implemented in the dialog class itse
 | :-- | :-- | :-- |
 | Programmatically close dialog | [ESNext](https://gist.dumber.app/?gist=1f04458dda868ab50e367f9ba8f7690e&open=src%2Fapp.js&open=src%2Fapp.html&open=src%2Fconfirm-dialog.js&open=src%2Fconfirm-dialog.html) | [TypeScript](https://gist.dumber.app/?gist=9739b6908b60770dd001d22aeb9f3bf5&open=src%2Fapp.ts&open=src%2Fapp.html&open=src%2Fconfirm-dialog.ts&open=src%2Fconfirm-dialog.html) |
 
-#### View only dialog
+### View only dialog
 
-#### Dialog with multiple view templates
+### Dialog with multiple view templates
 
-#### dialogSerivce.hasActiveDialog and dialogSerivce.controllers
+### dialogSerivce.hasActiveDialog and dialogSerivce.controllers
 
 DialogService exposes the controllers of the active dialogs through `dialogSerivce.controllers`, you can manually call `ok()` or `cancel()` on one or more of the controllers. It also exposes a simple boolean flag `dialogSerivce.hasActiveDialog` which is only `true` when there is at least one active dialog.
 
-### Recipes
+## Recipes
 
-#### z-index
+### z-index
 
 aurelia-dialog-lite does not provide an option to set starting z-index. Just put an z-index in your CSS directly. For example set to 1040 as same as boostrap's modal backdrop.
 
@@ -330,15 +330,15 @@ aurelia-dialog-lite does not provide an option to set starting z-index. Just put
 }
 ```
 
-#### Enter key
+### Enter key
 TODO Enter key with aurelia-combo, why we removed the feature from aurelia-dialog-lite due to edge cases.
 
-#### Position through CSS
+### Position through CSS
 TODO position dialog through CSS
 
 TODO position dialog in IE11 compatible CSS
 
-#### Transition and animation
+### Transition and animation
 TODO css transition and animation
 
 ## License
