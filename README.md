@@ -231,9 +231,9 @@ export class TestDialog {
 
 ## Customise settings
 
-On top of the global settings through `aurelia.use.plugin()`, there are two more places you can customise the dialog settings per dialog.
+On top of the global settings through `aurelia.use.plugin()`, there are two more places you can customise the settings per dialog.
 
-### 1. in `dialogService.open()` and `dialogService.create()` (showing in next section).
+### 1. in `dialogService.open()` and `dialogService.create()` (showing in next section: advanced usage).
 ```js
 this.dialogService.open({
   viewModel: TestDialog,
