@@ -311,9 +311,13 @@ Note technically the delayed closure can be implemented in the dialog class itse
 
 ### Dialog with multiple view templates
 
-### dialogSerivce.hasActiveDialog and dialogSerivce.controllers
+### dialogSerivce.hasActiveDialog, dialogSerivce.controllers, dialogSerivce.cancelAll()
 
 DialogService exposes the controllers of the active dialogs through `dialogSerivce.controllers`, you can manually call `ok()` or `cancel()` on one or more of the controllers. It also exposes a simple boolean flag `dialogSerivce.hasActiveDialog` which is only `true` when there is at least one active dialog.
+
+`dialogSerivce.cancelAll()` is a convenient method to cancel all active dialogs. It returns a promise to be resolved after all dialogs were cancelled.
+
+> `dialogSerivce.cancelAll()` replaced aurelia-dialog's original `dialogSerivce.closeAll()`.
 
 ## Recipes
 

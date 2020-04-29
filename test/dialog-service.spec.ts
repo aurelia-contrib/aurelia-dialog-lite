@@ -845,4 +845,52 @@ describe('DialogService', () => {
       expect(dialogService.hasActiveDialog).toBe(false);
     });
   });
+
+  describe('cancelAll', () => {
+    it('returns resolved promise if no active dialog', async () => {
+      expect(dialogService.controllers.length).toBe(0);
+      expect(dialogService.hasActiveDialog).toBe(false);
+
+      await dialogService.cancelAll();
+      expect(dialogService.controllers.length).toBe(0);
+      expect(dialogService.hasActiveDialog).toBe(false);
+    });
+
+    it('cancels dialogs', async () => {
+      const closePromise = dialogService.open({
+        viewModel: TestDialog,
+        model: { title: 'Test title' },
+        overlayDismiss: true
+      });
+      await delay();
+
+      const closePromise2 = dialogService.open({
+        viewModel: TestDialog2,
+        model: { title: 'Test title2' }
+      });
+      await delay();
+
+      expect(dialogService.controllers.length).toBe(2);
+      expect(dialogService.hasActiveDialog).toBe(true);
+
+      await dialogService.cancelAll();
+      await delay();
+      expect(dialogService.controllers.length).toBe(0);
+      expect(dialogService.hasActiveDialog).toBe(false);
+
+      try {
+        await closePromise;
+        fail("should not see resolved result");
+      } catch (e) {
+        expect(e.message).toBe('cancelled');
+      }
+
+      try {
+        await closePromise2;
+        fail("should not see resolved result");
+      } catch (e) {
+        expect(e.message).toBe('cancelled');
+      }
+    });
+  })
 });

@@ -50,6 +50,22 @@ export class DialogService {
   }
 
   /**
+   * Cancel all active dialog.
+   * @return Promise A promise that settles when all dialogs are cancelled.
+   */
+  public cancelAll(): Promise<void> {
+    let p = Promise.resolve();
+    for (let i = this.controllers.length - 1; i >= 0; i--) {
+      const controller = this.controllers[i];
+      p = p.then(() => {
+        controller.cancel();
+        return controller.closePromise.catch(() => undefined);
+      })
+    }
+    return p;
+  }
+
+  /**
    * Opens a new dialog, same as
    *   dialogService.create(settings).then(controller => controller.closePromise).
    * @param settings Dialog settings for this dialog instance.
