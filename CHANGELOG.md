@@ -1,3 +1,12 @@
+## [0.3.2](https://github.com/3cp/aurelia-dialog-lite/compare/v0.3.1...v0.3.2) (2020-04-29)
+
+
+### Features
+
+* dialogService.cancelAll() ([bba12cc](https://github.com/3cp/aurelia-dialog-lite/commit/bba12cc0f3d829238e3a2fca64a7d0582349392c))
+
+
+
 ## [0.3.1](https://github.com/3cp/aurelia-dialog-lite/compare/v0.3.0...v0.3.1) (2020-04-28)
 
 
