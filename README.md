@@ -275,7 +275,7 @@ this.controller.overlayDismiss = true;
 
 API `dialogService.create()` is similar to `dialogService.open()`, but it returns a promise that resolves to new dialog controller, so you can control the dialog from outside.
 
-In fact, `dialogService.open()` is simplify implemented through `dialogService.create()`.
+In fact, `dialogService.open()` is simply implemented through `dialogService.create()`.
 ```ts
 public open(contextSettings: DialogContextSettings = {}): Promise<any> {
   return this.create(contextSettings).then(
