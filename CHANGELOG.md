@@ -1,3 +1,12 @@
+## [0.3.3](https://github.com/aurelia-contrib/aurelia-dialog-lite/compare/v0.3.2...v0.3.3) (2020-05-05)
+
+
+### Features
+
+* move to aurelia-contrib ([8d67f57](https://github.com/aurelia-contrib/aurelia-dialog-lite/commit/8d67f57da90e30b9e297fa92c97574cc4ba82333))
+
+
+
 ## [0.3.2](https://github.com/3cp/aurelia-dialog-lite/compare/v0.3.1...v0.3.2) (2020-04-29)
 
 
