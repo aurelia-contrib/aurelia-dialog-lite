@@ -1,4 +1,4 @@
-# aurelia-dialog-lite ![CI](https://github.com/3cp/aurelia-dialog-lite/workflows/CI/badge.svg)
+# aurelia-dialog-lite ![CI](https://github.com/aurelia-contrib/aurelia-dialog-lite/workflows/CI/badge.svg)
 
 A very lite Aurelia dialog plugin.
 

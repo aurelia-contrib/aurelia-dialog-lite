@@ -13,13 +13,13 @@
     "dist"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/3cp/aurelia-dialog-lite",
+  "homepage": "https://github.com/aurelia-contrib/aurelia-dialog-lite",
   "bugs": {
-    "url": "https://github.com/3cp/aurelia-dialog-lite/issues"
+    "url": "https://github.com/aurelia-contrib/aurelia-dialog-lite/issues"
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/3cp/aurelia-dialog-lite"
+    "url": "http://github.com/aurelia-contrib/aurelia-dialog-lite"
   },
   "devDependencies": {
     "@types/jasmine": "^3.5.10",
