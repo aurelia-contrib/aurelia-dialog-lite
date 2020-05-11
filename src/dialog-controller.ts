@@ -110,6 +110,9 @@ export class DialogController implements DialogSettings {
    */
   public retainFocus(event: KeyboardEvent) {
     if (event.key !== 'Tab') return;
+    // Someone called preventDefault().
+    if (event.defaultPrevented) return;
+
     event.stopPropagation(); // Stop others listening on Tab.
     event.preventDefault();
 
