@@ -1,3 +1,12 @@
+## [0.3.4](https://github.com/aurelia-contrib/aurelia-dialog-lite/compare/v0.3.3...v0.3.4) (2020-05-11)
+
+
+### Bug Fixes
+
+* donot move focus on default prevented Tab key event ([1b03460](https://github.com/aurelia-contrib/aurelia-dialog-lite/commit/1b03460ce888d2ef21c76e153fd440609befda9f))
+
+
+
 ## [0.3.3](https://github.com/aurelia-contrib/aurelia-dialog-lite/compare/v0.3.2...v0.3.3) (2020-05-05)
 
 
