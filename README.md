@@ -308,6 +308,9 @@ Note technically the delayed closure can be implemented in the dialog class itse
 | Programmatically close dialog | [ESNext](https://gist.dumber.app/?gist=1f04458dda868ab50e367f9ba8f7690e&open=src%2Fapp.js&open=src%2Fapp.html&open=src%2Fconfirm-dialog.js&open=src%2Fconfirm-dialog.html) | [TypeScript](https://gist.dumber.app/?gist=9739b6908b60770dd001d22aeb9f3bf5&open=src%2Fapp.ts&open=src%2Fapp.html&open=src%2Fconfirm-dialog.ts&open=src%2Fconfirm-dialog.html) |
 
 ### View only dialog
+| Demo | | |
+| :-- | :-- | :-- |
+| View-only dialog | [ESNext](https://gist.dumber.app/?gist=e203e63f03beedd936b8f453404bc8d3&open=src%2Ftest-dialog.html&open=src%2Fapp.js) | [TypeScript](https://gist.dumber.app/?gist=9aa5c5362209f8f71faa4fb0237e1002&open=src%2Ftest-dialog.html&open=src%2Fapp.ts) |
 
 ### Dialog with multiple view templates
 
