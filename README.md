@@ -314,6 +314,10 @@ Note technically the delayed closure can be implemented in the dialog class itse
 
 ### Dialog with multiple view templates
 
+| Demo | | |
+| :-- | :-- | :-- |
+| Multiple view templates | [ESNext](https://gist.dumber.app/?gist=fe2736a24c8cf57b61d364dc7885dd0e&open=src%2Fapp.js) | [TypeScript](https://gist.dumber.app/?gist=80de7f5c65c4cc281a6985f0eddc8bd3&open=src%2Fapp.ts) |
+
 ### dialogSerivce.hasActiveDialog, dialogSerivce.controllers, dialogSerivce.cancelAll()
 
 DialogService exposes the controllers of the active dialogs through `dialogSerivce.controllers`, you can manually call `ok()` or `cancel()` on one or more of the controllers. It also exposes a simple boolean flag `dialogSerivce.hasActiveDialog` which is only `true` when there is at least one active dialog.
