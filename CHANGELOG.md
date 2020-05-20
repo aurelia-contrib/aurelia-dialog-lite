@@ -1,3 +1,12 @@
+## [0.3.5](https://github.com/aurelia-contrib/aurelia-dialog-lite/compare/v0.3.4...v0.3.5) (2020-05-20)
+
+
+### Bug Fixes
+
+* avoid overlay dismiss triggered by dragging-click ([7da6734](https://github.com/aurelia-contrib/aurelia-dialog-lite/commit/7da67347da7f6be1f602062b5c20b6541500364f))
+
+
+
 ## [0.3.4](https://github.com/aurelia-contrib/aurelia-dialog-lite/compare/v0.3.3...v0.3.4) (2020-05-11)
 
 
