@@ -725,7 +725,8 @@ describe('DialogService', () => {
       const closePromise = dialogService.open({viewModel: TestDialog, model: { title: 'Test title'}});
       await delay();
 
-      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('click'));
+      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('mousedown'));
+      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('mouseup'));
       await delay();
 
       expect(dialogService.controllers.length).toBe(1);
@@ -743,7 +744,8 @@ describe('DialogService', () => {
       });
       await delay();
 
-      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('click'));
+      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('mousedown'));
+      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('mouseup'));
       await delay();
 
       try {
@@ -760,7 +762,8 @@ describe('DialogService', () => {
       const closePromise = dialogService.open({viewModel: TestDialog2, model: { title: 'Test title' }});
       await delay();
 
-      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('click'));
+      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('mousedown'));
+      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('mouseup'));
       await delay();
 
       try {
@@ -782,7 +785,8 @@ describe('DialogService', () => {
       });
       await delay();
 
-      document.querySelector('.dialog-lite-overlay.my-overlay').dispatchEvent(new Event('click'));
+      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('mousedown'));
+      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('mouseup'));
       await delay();
 
       try {
@@ -816,7 +820,8 @@ describe('DialogService', () => {
       expect(overlays[1].querySelector('h2').textContent).toBe('Test title2');
 
       // cancel top dialog
-      document.querySelectorAll('.dialog-lite-overlay')[1].dispatchEvent(new Event('click'));
+      overlays[1].dispatchEvent(new Event('mousedown'));
+      overlays[1].dispatchEvent(new Event('mouseup'));
 
       try {
         await closePromise2;
@@ -832,7 +837,8 @@ describe('DialogService', () => {
       expect(overlays[0].querySelector('h2').textContent).toBe('Test title');
 
       // cancel first dialog
-      document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('click'));
+      overlays[0].dispatchEvent(new Event('mousedown'));
+      overlays[0].dispatchEvent(new Event('mouseup'));
 
       try {
         await closePromise;
@@ -892,5 +898,5 @@ describe('DialogService', () => {
         expect(e.message).toBe('cancelled');
       }
     });
-  })
+  });
 });

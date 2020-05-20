@@ -128,7 +128,8 @@ export class DialogService {
     dialogController.host.appendChild(dialogController.dialogOverlay);
     controller.attached();
 
-    dialogController.dialogOverlay.addEventListener('click', dialogController.cancelOnOverlay);
+    dialogController.dialogOverlay.addEventListener('mousedown', dialogController.cancelOnOverlay);
+    dialogController.dialogOverlay.addEventListener('mouseup', dialogController.cancelOnOverlay);
     dialogController.dialogOverlay.addEventListener('touchstart', dialogController.cancelOnOverlay);
 
     if (!this.hasActiveDialog) {
@@ -148,7 +149,8 @@ export class DialogService {
     const controller = this._controllers.splice(i, 1)[0];
     const lastActive = this._lastActives.splice(i, 1)[0];
 
-    dialogController.dialogOverlay.removeEventListener('click', dialogController.cancelOnOverlay);
+    dialogController.dialogOverlay.removeEventListener('mousedown', dialogController.cancelOnOverlay);
+    dialogController.dialogOverlay.removeEventListener('mouseup', dialogController.cancelOnOverlay);
     dialogController.dialogOverlay.removeEventListener('touchstart', dialogController.cancelOnOverlay);
 
     dialogController.host.removeChild(dialogController.dialogOverlay);

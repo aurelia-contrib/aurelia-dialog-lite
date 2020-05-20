@@ -36,6 +36,8 @@ export class DialogController implements DialogSettings {
    */
   private _resolve: (output?: any) => void;
   private _reject: (reason: Error) => void;
+  private _overlayMousedown: boolean = false;
+  private _resetOverlayMousedown: ReturnType<typeof setTimeout> | null = null;
 
   /**
    * Creates an instance of DialogController.
@@ -78,8 +80,21 @@ export class DialogController implements DialogSettings {
    * @internal
    */
   public cancelOnOverlay(event: Event): void {
-    if (this.overlayDismiss && event.target === this.dialogOverlay) {
-      this.cancel();
+    if (event.type === 'mousedown') {
+      if (this.overlayDismiss && event.target === this.dialogOverlay) {
+        this._overlayMousedown = true;
+        this._resetOverlayMousedown = setTimeout(() => {
+          this._overlayMousedown = false;
+          this._resetOverlayMousedown = null;
+        }, 2000);
+      }
+    } else if (event.type === 'mouseup' && this._overlayMousedown) {
+      clearTimeout(this._resetOverlayMousedown);
+      this._overlayMousedown = false;
+      this._resetOverlayMousedown = null;
+      if (this.overlayDismiss && event.target === this.dialogOverlay) {
+        this.cancel();
+      }
     }
   }
 

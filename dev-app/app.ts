@@ -11,7 +11,8 @@ export class App {
       viewModel: TestDialog,
       model: {
         name: 'Test'
-      }
+      },
+      overlayDismiss: true
     }).then(result => {
       console.log(result);
     });
