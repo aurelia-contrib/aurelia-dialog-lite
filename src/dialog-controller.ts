@@ -132,24 +132,35 @@ export class DialogController implements DialogSettings {
     event.preventDefault();
 
     let focusableNodes = this.getFocusableNodes();
-
-    // no focusable nodes
-    if (focusableNodes.length === 0) return;
-
     // Filters nodes which are hidden to prevent focus leak outside modal.
     focusableNodes = focusableNodes.filter(node => node.offsetParent);
 
-    const active = DOM.activeElement as HTMLElement;
-    // TODO check whether .contains works when there is shadow DOM
-    // inside the dialog. Not a big issue if it doesn't work
-    if (!this.dialogOverlay.contains(active)) {
+    const size = focusableNodes.length;
+    // no focusable nodes
+    if (size === 0) return;
+    if (size === 1) {
       focusableNodes[0].focus();
-    } else {
-      const index = focusableNodes.indexOf(active);
-      let nextIndex = index + (event.shiftKey ? -1 : 1);
-      if (nextIndex >= focusableNodes.length) nextIndex = 0;
-      else if (nextIndex < 0) nextIndex = focusableNodes.length - 1;
-      focusableNodes[nextIndex].focus();
+    }
+
+    const currentActive = DOM.activeElement as HTMLElement;
+    currentActive.blur();
+    let currentIndex = focusableNodes.indexOf(currentActive);
+
+    function nextIndex(index: number) {
+      let ni = index + (event.shiftKey ? -1 : 1);
+      if (ni >= size) ni = 0;
+      else if (ni < 0) ni = size - 1;
+      return ni;
+    }
+
+    let tryIndex: number | undefined;
+    for (let i = 0; i < size; i++) {
+      tryIndex = nextIndex(tryIndex === undefined ? currentIndex : tryIndex);
+      const node = focusableNodes[tryIndex];
+      node.focus();
+      // Return if focused, otherwise try next.
+      // Maximum try (size) times.
+      if (DOM.activeElement === node) break;
     }
   }
 }

@@ -23,6 +23,7 @@ DOM.injectStyles(css, DOM.querySelector('head'), true, 'dialog-lite-css');
   <div class="dialog">
     <h2>\${title}</h2>
     <button id="cancelBtn" click.trigger="controller.cancel()">Cancel</button>
+    <button style="visibility: hidden">Hidden Button</button>
     <button id="cancelBtn2" click.trigger="controller.cancel('the reason')">Cancel with message</button>
     <button id="okBtn" click.trigger="controller.ok()">OK</button>
     <button id="okBtn2" click.trigger="controller.ok({a:1,b:'2'})">OK with output</button>
@@ -44,6 +45,8 @@ export class TestDialog {
   <div class="dialog">
     <h2>\${title}</h2>
     <button id="d2-cancelBtn" click.trigger="controller.cancel('close')">Cancel</button>
+    <button style="display: none">Hidden Button</button>
+    <button style="display: none">Hidden Button</button>
     <button id="d2-okBtn" click.trigger="controller.ok({c:3})">OK</button>
   </div>
 </template>`)
