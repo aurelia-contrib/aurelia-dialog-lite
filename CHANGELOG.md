@@ -1,3 +1,12 @@
+# [1.0.0](https://github.com/aurelia-contrib/aurelia-dialog-lite/compare/v0.3.5...v1.0.0) (2020-05-31)
+
+
+### Bug Fixes
+
+* skip non-focusable node ([5a0efff](https://github.com/aurelia-contrib/aurelia-dialog-lite/commit/5a0efff0ed1c88c0017238d25a0497a5579bf06e))
+
+
+
 ## [0.3.5](https://github.com/aurelia-contrib/aurelia-dialog-lite/compare/v0.3.4...v0.3.5) (2020-05-20)
 
 
