@@ -223,7 +223,9 @@ export class TestDialog {
 ```
 
 * `controller.cancel(reason: string = 'cancelled')` supports an optional reason for the cancellation. Default to `"cancelled"`. You can get it out from the rejected `err.message` following `dialogService.open()`.
-* `controller.ok(output?: any)` supports an optional output for the resolution. You get get it out from the resolved output following `dialogService.open()`.
+* `controller.ok(output?: any)` supports an optional output for the resolution. The output is the resolved result of the promise returned by `dialogService.open()`.
+
+> Note different from original aurelia-dialog, `controller.cancel()` and `controller.ok()` are now synchronous, doesn't return a promise any more.
 
 | Demo | | |
 | :-- | :-- | :-- |
