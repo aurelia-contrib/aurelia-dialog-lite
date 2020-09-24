@@ -344,7 +344,14 @@ aurelia-dialog-lite does not provide an option to set starting z-index. Just put
 ```
 
 ### Enter key
-TODO Enter key with aurelia-combo, why we removed the feature from aurelia-dialog-lite due to edge cases.
+
+We removed "Enter" key support from original aurelia-dialog because of an edge case. When user uses "Tab" to shift focus to a cancel button, then hit "Enter" key, he/she wants to "click" the cancel button, not to trigger the default action of "Enter" key.
+
+Likely [aurelia-combo](https://github.com/aurelia-contrib/aurelia-combo) fixed the edge case. User can use aurelia-combo and aurelia-dialog-lite together to handle default "Enter" action without worrying about misfired "Enter" key on focused button.
+
+| Demo | | |
+| :-- | :-- | :-- |
+| Use aurelia-combo to handle "Enter" key | [ESNext](https://gist.dumber.app/?gist=e83451ca4f1b2ac28701efa630eeefe6&open=src%2Ftest-dialog.js) | [TypeScript](https://gist.dumber.app/?gist=a638043cda23467cff992817ed966ccd&open=src%2Ftest-dialog.ts) |
 
 ### Position through CSS
 TODO position dialog through CSS
