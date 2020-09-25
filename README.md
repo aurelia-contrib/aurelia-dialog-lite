@@ -364,7 +364,8 @@ Here is an example of customised `.dialog-lite-overlay` without using flex layou
 | Customise position | [ESNext](https://gist.dumber.app/?gist=7b5e9b8f402136125ab4a7dd957d8e81&open=src%2Fapp.scss) | [TypeScript](https://gist.dumber.app/?gist=5cad80f518b54432273605e17bd73190&open=src%2Fapp.scss) |
 
 ### Transition and animation
-TODO css transition and animation
+
+TBD: due to manual rendering, aurelia-dialog-lite doesn't work with aurelia-animator-css right now.
 
 ## License
 
