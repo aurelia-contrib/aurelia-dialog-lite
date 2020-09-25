@@ -1,3 +1,7 @@
+## [1.0.1](https://github.com/aurelia-contrib/aurelia-dialog-lite/compare/v1.0.0...v1.0.1) (2020-09-25)
+
+
+
 # [1.0.0](https://github.com/aurelia-contrib/aurelia-dialog-lite/compare/v0.3.5...v1.0.0) (2020-05-31)
 
 
