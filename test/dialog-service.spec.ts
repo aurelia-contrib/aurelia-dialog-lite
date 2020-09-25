@@ -4,7 +4,7 @@ import { DefaultLoader } from 'aurelia-loader-default';
 import { BindingLanguage, customElement, inlineView } from 'aurelia-templating';
 import { TemplatingBindingLanguage } from 'aurelia-templating-binding';
 import { DOM } from 'aurelia-pal';
-import { DefaultDialogSettings, DialogSettings } from '../src/dialog-settings';
+import { DefaultDialogSettings } from '../src/dialog-settings';
 import { DialogController } from '../src/dialog-controller';
 import { DialogService } from '../src/dialog-service';
 
@@ -625,6 +625,7 @@ describe('DialogService', () => {
   describe('ESC dismiss', () => {
     it('by default does not dismiss dialog on ESC key', async () => {
       const closePromise = dialogService.open({viewModel: TestDialog, model: { title: 'Test title'}});
+      closePromise.catch(() => 1); // To prevent unhandled reject
       await delay();
 
       await hit({key: 'Escape'});
@@ -641,6 +642,7 @@ describe('DialogService', () => {
         model: { title: 'Test title' },
         escDismiss: true
       });
+      closePromise.catch(() => 1); // To prevent unhandled reject
       await delay();
 
       await hit({key: 'Escape'});
@@ -657,6 +659,7 @@ describe('DialogService', () => {
 
     it('dismisses dialog on ESC key, with escDismiss option set by dialog', async () => {
       const closePromise = dialogService.open({viewModel: TestDialog2, model: { title: 'Test title' }});
+      closePromise.catch(() => 1); // To prevent unhandled reject
       await delay();
 
       await hit({key: 'Escape'});
@@ -677,12 +680,14 @@ describe('DialogService', () => {
         model: { title: 'Test title' },
         escDismiss: true
       });
+      closePromise.catch(() => 1); // To prevent unhandled reject
       await delay();
 
       const closePromise2 = dialogService.open({
         viewModel: TestDialog2,
         model: { title: 'Test title2' }
       });
+      closePromise2.catch(() => 1); // To prevent unhandled reject
       await delay();
 
       expect(dialogService.controllers.length).toBe(2);
@@ -726,6 +731,7 @@ describe('DialogService', () => {
   describe('overlay dismiss', () => {
     it('by default does not dismiss dialog on overlay click', async () => {
       const closePromise = dialogService.open({viewModel: TestDialog, model: { title: 'Test title'}});
+      closePromise.catch(() => 1); // To prevent unhandled reject
       await delay();
 
       document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('mousedown'));
@@ -745,6 +751,7 @@ describe('DialogService', () => {
         model: { title: 'Test title' },
         overlayDismiss: true
       });
+      closePromise.catch(() => 1); // To prevent unhandled reject
       await delay();
 
       document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('mousedown'));
@@ -763,6 +770,7 @@ describe('DialogService', () => {
 
     it('dismisses dialog on overlay click, with overlayDismiss option set by dialog', async () => {
       const closePromise = dialogService.open({viewModel: TestDialog2, model: { title: 'Test title' }});
+      closePromise.catch(() => 1); // To prevent unhandled reject
       await delay();
 
       document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('mousedown'));
@@ -786,6 +794,7 @@ describe('DialogService', () => {
         overlayDismiss: true,
         overlayClassName: 'dialog-lite-overlay my-overlay'
       });
+      closePromise.catch(() => 1); // To prevent unhandled reject
       await delay();
 
       document.querySelector('.dialog-lite-overlay').dispatchEvent(new Event('mousedown'));
@@ -808,12 +817,14 @@ describe('DialogService', () => {
         model: { title: 'Test title' },
         overlayDismiss: true
       });
+      closePromise.catch(() => 1); // To prevent unhandled reject
       await delay();
 
       const closePromise2 = dialogService.open({
         viewModel: TestDialog2,
         model: { title: 'Test title2' }
       });
+      closePromise2.catch(() => 1); // To prevent unhandled reject
       await delay();
 
       expect(dialogService.controllers.length).toBe(2);
@@ -871,12 +882,14 @@ describe('DialogService', () => {
         model: { title: 'Test title' },
         overlayDismiss: true
       });
+      closePromise.catch(() => 1); // To prevent unhandled reject
       await delay();
 
       const closePromise2 = dialogService.open({
         viewModel: TestDialog2,
         model: { title: 'Test title2' }
       });
+      closePromise2.catch(() => 1); // To prevent unhandled reject
       await delay();
 
       expect(dialogService.controllers.length).toBe(2);
