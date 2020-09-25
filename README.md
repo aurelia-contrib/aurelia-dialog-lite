@@ -354,9 +354,14 @@ Likely [aurelia-combo](https://github.com/aurelia-contrib/aurelia-combo) fixed t
 | Use aurelia-combo to handle "Enter" key | [ESNext](https://gist.dumber.app/?gist=e83451ca4f1b2ac28701efa630eeefe6&open=src%2Ftest-dialog.js) | [TypeScript](https://gist.dumber.app/?gist=a638043cda23467cff992817ed966ccd&open=src%2Ftest-dialog.ts) |
 
 ### Position through CSS
-TODO position dialog through CSS
 
-TODO position dialog in IE11 compatible CSS
+To customise the position of dialogs, you can directly overwrite the default css class `.dialog-lite-overlay` or provide your own css class together with `overlayClassName` option (can be either global or local setting).
+
+Here is an example of customised `.dialog-lite-overlay` without using flex layout (some old browsers do not support it well).
+
+| Demo | | |
+| :-- | :-- | :-- |
+| Customise position | [ESNext](https://gist.dumber.app/?gist=7b5e9b8f402136125ab4a7dd957d8e81&open=src%2Fapp.scss) | [TypeScript](https://gist.dumber.app/?gist=5cad80f518b54432273605e17bd73190&open=src%2Fapp.scss) |
 
 ### Transition and animation
 TODO css transition and animation
